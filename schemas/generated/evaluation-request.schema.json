@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "at_risk_population": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "title": "At Risk Population",
+      "type": "integer"
+    },
+    "hazard_threshold": {
+      "default": 0.5,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Hazard Threshold",
+      "type": "number"
+    }
+  },
+  "title": "EvaluationRequest",
+  "type": "object"
+}

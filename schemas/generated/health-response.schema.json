@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "database": {
+      "const": "sqlite",
+      "title": "Database",
+      "type": "string"
+    },
+    "sample_data": {
+      "title": "Sample Data",
+      "type": "boolean"
+    },
+    "service": {
+      "const": "cyclonescope-api",
+      "title": "Service",
+      "type": "string"
+    },
+    "status": {
+      "const": "ok",
+      "title": "Status",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "service",
+    "version",
+    "database",
+    "sample_data"
+  ],
+  "title": "HealthResponse",
+  "type": "object"
+}

@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "CapacityUnit": {
+      "enum": [
+        "people",
+        "beds",
+        "teams",
+        "people_day"
+      ],
+      "title": "CapacityUnit",
+      "type": "string"
+    },
+    "FacilityType": {
+      "enum": [
+        "shelter",
+        "medical",
+        "rescue",
+        "warehouse"
+      ],
+      "title": "FacilityType",
+      "type": "string"
+    },
+    "FacilityTypeEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_unit": {
+          "$ref": "#/$defs/CapacityUnit"
+        },
+        "capacity_value": {
+          "minimum": 0,
+          "title": "Capacity Value",
+          "type": "integer"
+        },
+        "facility_count": {
+          "minimum": 0,
+          "title": "Facility Count",
+          "type": "integer"
+        },
+        "modeled_reachable_population": {
+          "minimum": 0,
+          "title": "Modeled Reachable Population",
+          "type": "integer"
+        },
+        "type": {
+          "$ref": "#/$defs/FacilityType"
+        }
+      },
+      "required": [
+        "type",
+        "facility_count",
+        "capacity_value",
+        "capacity_unit",
+        "modeled_reachable_population"
+      ],
+      "title": "FacilityTypeEvaluation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "at_risk_population": {
+      "exclusiveMinimum": 0,
+      "title": "At Risk Population",
+      "type": "integer"
+    },
+    "by_type": {
+      "items": {
+        "$ref": "#/$defs/FacilityTypeEvaluation"
+      },
+      "title": "By Type",
+      "type": "array"
+    },
+    "covered_population_per_budget_point": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Covered Population Per Budget Point"
+    },
+    "data_status": {
+      "const": "scenario_model",
+      "default": "scenario_model",
+      "title": "Data Status",
+      "type": "string"
+    },
+    "facility_count": {
+      "minimum": 0,
+      "title": "Facility Count",
+      "type": "integer"
+    },
+    "modeled_coverage_ratio": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Modeled Coverage Ratio",
+      "type": "number"
+    },
+    "modeled_covered_population": {
+      "minimum": 0,
+      "title": "Modeled Covered Population",
+      "type": "integer"
+    },
+    "modeled_uncovered_population": {
+      "minimum": 0,
+      "title": "Modeled Uncovered Population",
+      "type": "integer"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "total_budget_points": {
+      "minimum": 0,
+      "title": "Total Budget Points",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "scenario_id",
+    "facility_count",
+    "at_risk_population",
+    "modeled_covered_population",
+    "modeled_uncovered_population",
+    "modeled_coverage_ratio",
+    "total_budget_points",
+    "assumptions"
+  ],
+  "title": "EvaluationResponse",
+  "type": "object"
+}

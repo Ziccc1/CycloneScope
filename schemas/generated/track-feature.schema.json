@@ -1,0 +1,110 @@
+{
+  "$defs": {
+    "Basin": {
+      "enum": [
+        "NA",
+        "SA",
+        "WP",
+        "EP",
+        "NI",
+        "SI",
+        "SP",
+        "AU",
+        "XX"
+      ],
+      "title": "Basin",
+      "type": "string"
+    },
+    "GeoPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lon": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lon",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lon",
+        "lat"
+      ],
+      "title": "GeoPoint",
+      "type": "object"
+    },
+    "NormalizedPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "maximum": 2,
+          "minimum": -2,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "maximum": 2,
+          "minimum": -2,
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "NormalizedPoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "basin": {
+      "$ref": "#/$defs/Basin"
+    },
+    "geographic_points": {
+      "items": {
+        "$ref": "#/$defs/GeoPoint"
+      },
+      "maxItems": 64,
+      "minItems": 64,
+      "title": "Geographic Points",
+      "type": "array"
+    },
+    "normalized_points": {
+      "items": {
+        "$ref": "#/$defs/NormalizedPoint"
+      },
+      "maxItems": 64,
+      "minItems": 64,
+      "title": "Normalized Points",
+      "type": "array"
+    },
+    "season": {
+      "maximum": 2200,
+      "minimum": 1840,
+      "title": "Season",
+      "type": "integer"
+    },
+    "storm_id": {
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Storm Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "storm_id",
+    "basin",
+    "season",
+    "geographic_points",
+    "normalized_points"
+  ],
+  "title": "TrackFeature",
+  "type": "object"
+}

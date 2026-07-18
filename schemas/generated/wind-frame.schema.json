@@ -1,0 +1,84 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "dataset_id": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "height": {
+      "maximum": 10000,
+      "minimum": 2,
+      "title": "Height",
+      "type": "integer"
+    },
+    "missing_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Missing Value"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "time": {
+      "format": "date-time",
+      "title": "Time",
+      "type": "string"
+    },
+    "u": {
+      "items": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "U",
+      "type": "array"
+    },
+    "v": {
+      "items": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "V",
+      "type": "array"
+    },
+    "width": {
+      "maximum": 10000,
+      "minimum": 2,
+      "title": "Width",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "time",
+    "width",
+    "height",
+    "u",
+    "v"
+  ],
+  "title": "WindFrame",
+  "type": "object"
+}

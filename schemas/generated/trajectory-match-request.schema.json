@@ -1,0 +1,109 @@
+{
+  "$defs": {
+    "Basin": {
+      "enum": [
+        "NA",
+        "SA",
+        "WP",
+        "EP",
+        "NI",
+        "SI",
+        "SP",
+        "AU",
+        "XX"
+      ],
+      "title": "Basin",
+      "type": "string"
+    },
+    "GeoPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lon": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lon",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lon",
+        "lat"
+      ],
+      "title": "GeoPoint",
+      "type": "object"
+    },
+    "TrajectoryFilters": {
+      "additionalProperties": false,
+      "properties": {
+        "basins": {
+          "items": {
+            "$ref": "#/$defs/Basin"
+          },
+          "title": "Basins",
+          "type": "array"
+        },
+        "season_from": {
+          "default": 1840,
+          "maximum": 2200,
+          "minimum": 1840,
+          "title": "Season From",
+          "type": "integer"
+        },
+        "season_to": {
+          "default": 2200,
+          "maximum": 2200,
+          "minimum": 1840,
+          "title": "Season To",
+          "type": "integer"
+        }
+      },
+      "title": "TrajectoryFilters",
+      "type": "object"
+    },
+    "TrajectoryMatchMode": {
+      "enum": [
+        "geographic",
+        "shape"
+      ],
+      "title": "TrajectoryMatchMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "filters": {
+      "$ref": "#/$defs/TrajectoryFilters"
+    },
+    "mode": {
+      "$ref": "#/$defs/TrajectoryMatchMode"
+    },
+    "points": {
+      "items": {
+        "$ref": "#/$defs/GeoPoint"
+      },
+      "maxItems": 512,
+      "minItems": 2,
+      "title": "Points",
+      "type": "array"
+    },
+    "top_k": {
+      "default": 5,
+      "maximum": 20,
+      "minimum": 1,
+      "title": "Top K",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "mode",
+    "points"
+  ],
+  "title": "TrajectoryMatchRequest",
+  "type": "object"
+}

@@ -1,0 +1,106 @@
+{
+  "files": [
+    {
+      "file": "health-response.schema.json",
+      "id": "health-response",
+      "model": "HealthResponse"
+    },
+    {
+      "file": "data-source-list.schema.json",
+      "id": "data-source-list",
+      "model": "DataSourceListResponse"
+    },
+    {
+      "file": "storm-catalog.schema.json",
+      "id": "storm-catalog",
+      "model": "StormCatalogResponse"
+    },
+    {
+      "file": "storm-detail.schema.json",
+      "id": "storm-detail",
+      "model": "StormDetail"
+    },
+    {
+      "file": "storm-track.schema.json",
+      "id": "storm-track",
+      "model": "StormTrackResponse"
+    },
+    {
+      "file": "storm-impact.schema.json",
+      "id": "storm-impact",
+      "model": "StormImpactResponse"
+    },
+    {
+      "file": "wind-manifest.schema.json",
+      "id": "wind-manifest",
+      "model": "WindManifest"
+    },
+    {
+      "file": "wind-frame.schema.json",
+      "id": "wind-frame",
+      "model": "WindFrame"
+    },
+    {
+      "file": "impact-grid.schema.json",
+      "id": "impact-grid",
+      "model": "ImpactGridCollection"
+    },
+    {
+      "file": "taiwan-zones.schema.json",
+      "id": "taiwan-zones",
+      "model": "TaiwanZoneCollection"
+    },
+    {
+      "file": "taiwan-facilities.schema.json",
+      "id": "taiwan-facilities",
+      "model": "FacilityCollection"
+    },
+    {
+      "file": "track-feature.schema.json",
+      "id": "track-feature",
+      "model": "TrackFeature"
+    },
+    {
+      "file": "trajectory-match-request.schema.json",
+      "id": "trajectory-match-request",
+      "model": "TrajectoryMatchRequest"
+    },
+    {
+      "file": "trajectory-match-response.schema.json",
+      "id": "trajectory-match-response",
+      "model": "TrajectoryMatchResponse"
+    },
+    {
+      "file": "scenario-create.schema.json",
+      "id": "scenario-create",
+      "model": "ScenarioCreate"
+    },
+    {
+      "file": "scenario-read.schema.json",
+      "id": "scenario-read",
+      "model": "ScenarioRead"
+    },
+    {
+      "file": "facility-create.schema.json",
+      "id": "facility-create",
+      "model": "FacilityCreate"
+    },
+    {
+      "file": "facility-read.schema.json",
+      "id": "facility-read",
+      "model": "FacilityRead"
+    },
+    {
+      "file": "evaluation-request.schema.json",
+      "id": "evaluation-request",
+      "model": "EvaluationRequest"
+    },
+    {
+      "file": "evaluation-response.schema.json",
+      "id": "evaluation-response",
+      "model": "EvaluationResponse"
+    }
+  ],
+  "schema_version": "1.0",
+  "source": "backend.app.schemas"
+}

@@ -1,0 +1,261 @@
+{
+  "$defs": {
+    "CapacityUnit": {
+      "enum": [
+        "people",
+        "beds",
+        "teams",
+        "people_day"
+      ],
+      "title": "CapacityUnit",
+      "type": "string"
+    },
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    },
+    "FacilityFeature": {
+      "additionalProperties": false,
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/PointGeometry"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
+        "properties": {
+          "$ref": "#/$defs/FacilityProperties"
+        },
+        "type": {
+          "const": "Feature",
+          "default": "Feature",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "geometry",
+        "properties"
+      ],
+      "title": "FacilityFeature",
+      "type": "object"
+    },
+    "FacilityProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Address"
+        },
+        "budget_points": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Budget Points"
+        },
+        "capacity_unit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapacityUnit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capacity_value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capacity Value"
+        },
+        "county_code": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "County Code"
+        },
+        "data_status": {
+          "$ref": "#/$defs/DataStatus"
+        },
+        "facility_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Facility Id",
+          "type": "string"
+        },
+        "is_simulated": {
+          "default": false,
+          "title": "Is Simulated",
+          "type": "boolean"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "service_radius_km": {
+          "exclusiveMinimum": 0,
+          "maximum": 200,
+          "title": "Service Radius Km",
+          "type": "number"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "type": {
+          "$ref": "#/$defs/FacilityType"
+        }
+      },
+      "required": [
+        "facility_id",
+        "name",
+        "type",
+        "service_radius_km",
+        "data_status"
+      ],
+      "title": "FacilityProperties",
+      "type": "object"
+    },
+    "FacilityType": {
+      "enum": [
+        "shelter",
+        "medical",
+        "rescue",
+        "warehouse"
+      ],
+      "title": "FacilityType",
+      "type": "string"
+    },
+    "PointGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Point",
+          "default": "Point",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "PointGeometry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
+    "features": {
+      "items": {
+        "$ref": "#/$defs/FacilityFeature"
+      },
+      "title": "Features",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "type": {
+      "const": "FeatureCollection",
+      "default": "FeatureCollection",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data_status",
+    "features"
+  ],
+  "title": "FacilityCollection",
+  "type": "object"
+}

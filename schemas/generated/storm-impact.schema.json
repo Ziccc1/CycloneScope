@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
+    "estimated_exposed_population": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Estimated Exposed Population"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "reported_affected_population": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reported Affected Population"
+    },
+    "reported_damage_usd_2024": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reported Damage Usd 2024"
+    },
+    "reported_deaths": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reported Deaths"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "storm_id": {
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Storm Id",
+      "type": "string"
+    },
+    "warning": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Warning"
+    },
+    "wind_footprint_area_km2": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Wind Footprint Area Km2"
+    }
+  },
+  "required": [
+    "data_status",
+    "storm_id"
+  ],
+  "title": "StormImpactResponse",
+  "type": "object"
+}

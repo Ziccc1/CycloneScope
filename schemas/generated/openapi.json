@@ -1,0 +1,3205 @@
+{
+  "components": {
+    "schemas": {
+      "Basin": {
+        "enum": [
+          "NA",
+          "SA",
+          "WP",
+          "EP",
+          "NI",
+          "SI",
+          "SP",
+          "AU",
+          "XX"
+        ],
+        "title": "Basin",
+        "type": "string"
+      },
+      "CapacityUnit": {
+        "enum": [
+          "people",
+          "beds",
+          "teams",
+          "people_day"
+        ],
+        "title": "CapacityUnit",
+        "type": "string"
+      },
+      "DataSource": {
+        "additionalProperties": false,
+        "properties": {
+          "accessed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Accessed At"
+          },
+          "id": {
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "title": "Id",
+            "type": "string"
+          },
+          "license_name": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "License Name"
+          },
+          "name": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Purpose",
+            "type": "string"
+          },
+          "status": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "format": "uri",
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "purpose",
+          "status"
+        ],
+        "title": "DataSource",
+        "type": "object"
+      },
+      "DataSourceListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "minimum": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DataSource"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "DataSourceListResponse",
+        "type": "object"
+      },
+      "DataStatus": {
+        "enum": [
+          "observed",
+          "reanalysis",
+          "reported",
+          "modeled",
+          "mixed",
+          "synthetic_fixture",
+          "synthetic_demo",
+          "algorithmic_result",
+          "scenario_model"
+        ],
+        "title": "DataStatus",
+        "type": "string"
+      },
+      "EvaluationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "at_risk_population": {
+            "default": 100000,
+            "exclusiveMinimum": 0,
+            "title": "At Risk Population",
+            "type": "integer"
+          },
+          "hazard_threshold": {
+            "default": 0.5,
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Hazard Threshold",
+            "type": "number"
+          }
+        },
+        "title": "EvaluationRequest",
+        "type": "object"
+      },
+      "EvaluationResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "at_risk_population": {
+            "exclusiveMinimum": 0,
+            "title": "At Risk Population",
+            "type": "integer"
+          },
+          "by_type": {
+            "items": {
+              "$ref": "#/components/schemas/FacilityTypeEvaluation"
+            },
+            "title": "By Type",
+            "type": "array"
+          },
+          "covered_population_per_budget_point": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Covered Population Per Budget Point"
+          },
+          "data_status": {
+            "const": "scenario_model",
+            "default": "scenario_model",
+            "title": "Data Status",
+            "type": "string"
+          },
+          "facility_count": {
+            "minimum": 0,
+            "title": "Facility Count",
+            "type": "integer"
+          },
+          "modeled_coverage_ratio": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Modeled Coverage Ratio",
+            "type": "number"
+          },
+          "modeled_covered_population": {
+            "minimum": 0,
+            "title": "Modeled Covered Population",
+            "type": "integer"
+          },
+          "modeled_uncovered_population": {
+            "minimum": 0,
+            "title": "Modeled Uncovered Population",
+            "type": "integer"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "total_budget_points": {
+            "minimum": 0,
+            "title": "Total Budget Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "facility_count",
+          "at_risk_population",
+          "modeled_covered_population",
+          "modeled_uncovered_population",
+          "modeled_coverage_ratio",
+          "total_budget_points",
+          "assumptions"
+        ],
+        "title": "EvaluationResponse",
+        "type": "object"
+      },
+      "FacilityCollection": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/FacilityFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_status",
+          "features"
+        ],
+        "title": "FacilityCollection",
+        "type": "object"
+      },
+      "FacilityCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "budget_points": {
+            "anyOf": [
+              {
+                "maximum": 5,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Budget Points"
+          },
+          "capacity_unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CapacityUnit"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "capacity_value": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Capacity Value"
+          },
+          "lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Lon",
+            "type": "number"
+          },
+          "service_radius_km": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 200,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Service Radius Km"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FacilityType"
+          }
+        },
+        "required": [
+          "type",
+          "lon",
+          "lat"
+        ],
+        "title": "FacilityCreate",
+        "type": "object"
+      },
+      "FacilityFeature": {
+        "additionalProperties": false,
+        "properties": {
+          "geometry": {
+            "$ref": "#/components/schemas/PointGeometry"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/FacilityProperties"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "geometry",
+          "properties"
+        ],
+        "title": "FacilityFeature",
+        "type": "object"
+      },
+      "FacilityProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Address"
+          },
+          "budget_points": {
+            "anyOf": [
+              {
+                "maximum": 5,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Budget Points"
+          },
+          "capacity_unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CapacityUnit"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "capacity_value": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Capacity Value"
+          },
+          "county_code": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "County Code"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "facility_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Facility Id",
+            "type": "string"
+          },
+          "is_simulated": {
+            "default": false,
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "service_radius_km": {
+            "exclusiveMinimum": 0,
+            "maximum": 200,
+            "title": "Service Radius Km",
+            "type": "number"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FacilityType"
+          }
+        },
+        "required": [
+          "facility_id",
+          "name",
+          "type",
+          "service_radius_km",
+          "data_status"
+        ],
+        "title": "FacilityProperties",
+        "type": "object"
+      },
+      "FacilityRead": {
+        "additionalProperties": false,
+        "properties": {
+          "budget_points": {
+            "anyOf": [
+              {
+                "maximum": 5,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Budget Points"
+          },
+          "capacity_unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CapacityUnit"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "capacity_value": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Capacity Value"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Lon",
+            "type": "number"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "service_radius_km": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 200,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Service Radius Km"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FacilityType"
+          }
+        },
+        "required": [
+          "type",
+          "lon",
+          "lat",
+          "id",
+          "scenario_id",
+          "is_simulated"
+        ],
+        "title": "FacilityRead",
+        "type": "object"
+      },
+      "FacilityType": {
+        "enum": [
+          "shelter",
+          "medical",
+          "rescue",
+          "warehouse"
+        ],
+        "title": "FacilityType",
+        "type": "string"
+      },
+      "FacilityTypeEvaluation": {
+        "additionalProperties": false,
+        "properties": {
+          "capacity_unit": {
+            "$ref": "#/components/schemas/CapacityUnit"
+          },
+          "capacity_value": {
+            "minimum": 0,
+            "title": "Capacity Value",
+            "type": "integer"
+          },
+          "facility_count": {
+            "minimum": 0,
+            "title": "Facility Count",
+            "type": "integer"
+          },
+          "modeled_reachable_population": {
+            "minimum": 0,
+            "title": "Modeled Reachable Population",
+            "type": "integer"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FacilityType"
+          }
+        },
+        "required": [
+          "type",
+          "facility_count",
+          "capacity_value",
+          "capacity_unit",
+          "modeled_reachable_population"
+        ],
+        "title": "FacilityTypeEvaluation",
+        "type": "object"
+      },
+      "GeoBounds": {
+        "additionalProperties": false,
+        "properties": {
+          "crosses_antimeridian": {
+            "default": false,
+            "title": "Crosses Antimeridian",
+            "type": "boolean"
+          },
+          "east": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "East",
+            "type": "number"
+          },
+          "north": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "North",
+            "type": "number"
+          },
+          "south": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "South",
+            "type": "number"
+          },
+          "west": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "West",
+            "type": "number"
+          }
+        },
+        "required": [
+          "west",
+          "south",
+          "east",
+          "north"
+        ],
+        "title": "GeoBounds",
+        "type": "object"
+      },
+      "GeoPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Lon",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lon",
+          "lat"
+        ],
+        "title": "GeoPoint",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "database": {
+            "const": "sqlite",
+            "title": "Database",
+            "type": "string"
+          },
+          "sample_data": {
+            "title": "Sample Data",
+            "type": "boolean"
+          },
+          "service": {
+            "const": "cyclonescope-api",
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "version",
+          "database",
+          "sample_data"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "ImpactGridCollection": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/ImpactGridFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "metric": {
+            "enum": [
+              "hazard_index",
+              "max_wind_ms",
+              "precip_mm",
+              "population",
+              "exposed_population",
+              "reported_damage_usd"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_status",
+          "features",
+          "metric"
+        ],
+        "title": "ImpactGridCollection",
+        "type": "object"
+      },
+      "ImpactGridFeature": {
+        "additionalProperties": false,
+        "properties": {
+          "geometry": {
+            "discriminator": {
+              "mapping": {
+                "MultiPolygon": "#/components/schemas/MultiPolygonGeometry",
+                "Polygon": "#/components/schemas/PolygonGeometry"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              }
+            ],
+            "title": "Geometry"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ImpactGridProperties"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "geometry",
+          "properties"
+        ],
+        "title": "ImpactGridFeature",
+        "type": "object"
+      },
+      "ImpactGridProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "cell_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Cell Id",
+            "type": "string"
+          },
+          "contributing_storm_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Contributing Storm Ids",
+            "type": "array"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "exposed_population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Exposed Population"
+          },
+          "hazard_index": {
+            "anyOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Hazard Index"
+          },
+          "max_wind_ms": {
+            "anyOf": [
+              {
+                "maximum": 150,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Wind Ms"
+          },
+          "population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Population"
+          },
+          "precip_mm": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Precip Mm"
+          },
+          "reported_damage_price_year": {
+            "anyOf": [
+              {
+                "maximum": 2200,
+                "minimum": 1900,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Price Year"
+          },
+          "reported_damage_usd": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Usd"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "time_end": {
+            "format": "date-time",
+            "title": "Time End",
+            "type": "string"
+          },
+          "time_start": {
+            "format": "date-time",
+            "title": "Time Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cell_id",
+          "time_start",
+          "time_end",
+          "data_status"
+        ],
+        "title": "ImpactGridProperties",
+        "type": "object"
+      },
+      "MultiPolygonGeometry": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "items": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "minItems": 1,
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "MultiPolygon",
+            "default": "MultiPolygon",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "MultiPolygonGeometry",
+        "type": "object"
+      },
+      "NormalizedPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "maximum": 2,
+            "minimum": -2,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 2,
+            "minimum": -2,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "NormalizedPoint",
+        "type": "object"
+      },
+      "PointGeometry": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Point",
+            "default": "Point",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "PointGeometry",
+        "type": "object"
+      },
+      "PolygonGeometry": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "minItems": 1,
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Polygon",
+            "default": "Polygon",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "PolygonGeometry",
+        "type": "object"
+      },
+      "ScenarioCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ScenarioCreate",
+        "type": "object"
+      },
+      "ScenarioRead": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "title": "ScenarioRead",
+        "type": "object"
+      },
+      "StormCatalogResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "minimum": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StormSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data_status",
+          "items",
+          "count"
+        ],
+        "title": "StormCatalogResponse",
+        "type": "object"
+      },
+      "StormDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "ace": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ace"
+          },
+          "basin": {
+            "$ref": "#/components/schemas/Basin"
+          },
+          "classic": {
+            "default": false,
+            "title": "Classic",
+            "type": "boolean"
+          },
+          "classic_rank": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Classic Rank"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "duration_hours": {
+            "minimum": 0,
+            "title": "Duration Hours",
+            "type": "number"
+          },
+          "end_time": {
+            "format": "date-time",
+            "title": "End Time",
+            "type": "string"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/StormImpact"
+          },
+          "impact_available": {
+            "default": false,
+            "title": "Impact Available",
+            "type": "boolean"
+          },
+          "impact_score": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Impact Score"
+          },
+          "landfall_count": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Landfall Count",
+            "type": "integer"
+          },
+          "max_wind_ms": {
+            "anyOf": [
+              {
+                "maximum": 150,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Wind Ms"
+          },
+          "min_pressure_hpa": {
+            "anyOf": [
+              {
+                "maximum": 1100,
+                "minimum": 800,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Min Pressure Hpa"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "reported_damage_usd_2024": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Usd 2024"
+          },
+          "reported_deaths": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Deaths"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "score_coverage": {
+            "default": 0,
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Score Coverage",
+            "type": "number"
+          },
+          "season": {
+            "maximum": 2200,
+            "minimum": 1840,
+            "title": "Season",
+            "type": "integer"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          },
+          "track": {
+            "items": {
+              "$ref": "#/components/schemas/TrackPoint"
+            },
+            "minItems": 1,
+            "title": "Track",
+            "type": "array"
+          },
+          "wind_available": {
+            "default": false,
+            "title": "Wind Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "season",
+          "basin",
+          "start_time",
+          "end_time",
+          "duration_hours",
+          "data_status",
+          "track",
+          "impact"
+        ],
+        "title": "StormDetail",
+        "type": "object"
+      },
+      "StormImpact": {
+        "additionalProperties": false,
+        "properties": {
+          "estimated_exposed_population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Estimated Exposed Population"
+          },
+          "reported_affected_population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Affected Population"
+          },
+          "reported_damage_usd_2024": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Usd 2024"
+          },
+          "reported_deaths": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Deaths"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Warning"
+          },
+          "wind_footprint_area_km2": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wind Footprint Area Km2"
+          }
+        },
+        "title": "StormImpact",
+        "type": "object"
+      },
+      "StormImpactResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "estimated_exposed_population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Estimated Exposed Population"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "reported_affected_population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Affected Population"
+          },
+          "reported_damage_usd_2024": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Usd 2024"
+          },
+          "reported_deaths": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Deaths"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "storm_id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Storm Id",
+            "type": "string"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Warning"
+          },
+          "wind_footprint_area_km2": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wind Footprint Area Km2"
+          }
+        },
+        "required": [
+          "data_status",
+          "storm_id"
+        ],
+        "title": "StormImpactResponse",
+        "type": "object"
+      },
+      "StormSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "ace": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ace"
+          },
+          "basin": {
+            "$ref": "#/components/schemas/Basin"
+          },
+          "classic": {
+            "default": false,
+            "title": "Classic",
+            "type": "boolean"
+          },
+          "classic_rank": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Classic Rank"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "duration_hours": {
+            "minimum": 0,
+            "title": "Duration Hours",
+            "type": "number"
+          },
+          "end_time": {
+            "format": "date-time",
+            "title": "End Time",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "impact_available": {
+            "default": false,
+            "title": "Impact Available",
+            "type": "boolean"
+          },
+          "impact_score": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Impact Score"
+          },
+          "landfall_count": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Landfall Count",
+            "type": "integer"
+          },
+          "max_wind_ms": {
+            "anyOf": [
+              {
+                "maximum": 150,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Wind Ms"
+          },
+          "min_pressure_hpa": {
+            "anyOf": [
+              {
+                "maximum": 1100,
+                "minimum": 800,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Min Pressure Hpa"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "reported_damage_usd_2024": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Damage Usd 2024"
+          },
+          "reported_deaths": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reported Deaths"
+          },
+          "score_coverage": {
+            "default": 0,
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Score Coverage",
+            "type": "number"
+          },
+          "season": {
+            "maximum": 2200,
+            "minimum": 1840,
+            "title": "Season",
+            "type": "integer"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          },
+          "wind_available": {
+            "default": false,
+            "title": "Wind Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "season",
+          "basin",
+          "start_time",
+          "end_time",
+          "duration_hours",
+          "data_status"
+        ],
+        "title": "StormSummary",
+        "type": "object"
+      },
+      "StormTrackResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/TrackPoint"
+            },
+            "minItems": 1,
+            "title": "Points",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "storm_id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Storm Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_status",
+          "storm_id",
+          "points"
+        ],
+        "title": "StormTrackResponse",
+        "type": "object"
+      },
+      "TaiwanZoneCollection": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/TaiwanZoneFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_status",
+          "features"
+        ],
+        "title": "TaiwanZoneCollection",
+        "type": "object"
+      },
+      "TaiwanZoneFeature": {
+        "additionalProperties": false,
+        "properties": {
+          "geometry": {
+            "discriminator": {
+              "mapping": {
+                "MultiPolygon": "#/components/schemas/MultiPolygonGeometry",
+                "Polygon": "#/components/schemas/PolygonGeometry"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              }
+            ],
+            "title": "Geometry"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/TaiwanZoneProperties"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "geometry",
+          "properties"
+        ],
+        "title": "TaiwanZoneFeature",
+        "type": "object"
+      },
+      "TaiwanZoneProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "area_km2": {
+            "exclusiveMinimum": 0,
+            "title": "Area Km2",
+            "type": "number"
+          },
+          "centroid_lat": {
+            "maximum": 27,
+            "minimum": 21,
+            "title": "Centroid Lat",
+            "type": "number"
+          },
+          "centroid_lon": {
+            "maximum": 123,
+            "minimum": 118,
+            "title": "Centroid Lon",
+            "type": "number"
+          },
+          "county_code": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "County Code",
+            "type": "string"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "name_zh": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name Zh",
+            "type": "string"
+          },
+          "population": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Population"
+          },
+          "population_year": {
+            "anyOf": [
+              {
+                "maximum": 2200,
+                "minimum": 1900,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Population Year"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "town_code": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Town Code"
+          },
+          "zone_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Zone Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone_id",
+          "county_code",
+          "name_zh",
+          "area_km2",
+          "centroid_lon",
+          "centroid_lat",
+          "data_status"
+        ],
+        "title": "TaiwanZoneProperties",
+        "type": "object"
+      },
+      "TrackFeature": {
+        "additionalProperties": false,
+        "properties": {
+          "basin": {
+            "$ref": "#/components/schemas/Basin"
+          },
+          "geographic_points": {
+            "items": {
+              "$ref": "#/components/schemas/GeoPoint"
+            },
+            "maxItems": 64,
+            "minItems": 64,
+            "title": "Geographic Points",
+            "type": "array"
+          },
+          "normalized_points": {
+            "items": {
+              "$ref": "#/components/schemas/NormalizedPoint"
+            },
+            "maxItems": 64,
+            "minItems": 64,
+            "title": "Normalized Points",
+            "type": "array"
+          },
+          "season": {
+            "maximum": 2200,
+            "minimum": 1840,
+            "title": "Season",
+            "type": "integer"
+          },
+          "storm_id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Storm Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "storm_id",
+          "basin",
+          "season",
+          "geographic_points",
+          "normalized_points"
+        ],
+        "title": "TrackFeature",
+        "type": "object"
+      },
+      "TrackPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
+          },
+          "is_landfall": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Is Landfall"
+          },
+          "lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Lon",
+            "type": "number"
+          },
+          "moving_speed_kmh": {
+            "anyOf": [
+              {
+                "maximum": 400,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Moving Speed Kmh"
+          },
+          "pressure_hpa": {
+            "anyOf": [
+              {
+                "maximum": 1100,
+                "minimum": 800,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pressure Hpa"
+          },
+          "source_agency": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Agency"
+          },
+          "storm_status": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Storm Status"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          },
+          "wind_ms": {
+            "anyOf": [
+              {
+                "maximum": 150,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wind Ms"
+          }
+        },
+        "required": [
+          "time",
+          "lon",
+          "lat"
+        ],
+        "title": "TrackPoint",
+        "type": "object"
+      },
+      "TrajectoryFilters": {
+        "additionalProperties": false,
+        "properties": {
+          "basins": {
+            "items": {
+              "$ref": "#/components/schemas/Basin"
+            },
+            "title": "Basins",
+            "type": "array"
+          },
+          "season_from": {
+            "default": 1840,
+            "maximum": 2200,
+            "minimum": 1840,
+            "title": "Season From",
+            "type": "integer"
+          },
+          "season_to": {
+            "default": 2200,
+            "maximum": 2200,
+            "minimum": 1840,
+            "title": "Season To",
+            "type": "integer"
+          }
+        },
+        "title": "TrajectoryFilters",
+        "type": "object"
+      },
+      "TrajectoryMatch": {
+        "additionalProperties": false,
+        "properties": {
+          "direction_component": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Direction Component",
+            "type": "number"
+          },
+          "explanation": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "frechet_component": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Frechet Component",
+            "type": "number"
+          },
+          "rank": {
+            "minimum": 1,
+            "title": "Rank",
+            "type": "integer"
+          },
+          "similarity": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Similarity",
+            "type": "number"
+          },
+          "storm_id": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Storm Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "storm_id",
+          "rank",
+          "similarity",
+          "frechet_component",
+          "direction_component",
+          "explanation"
+        ],
+        "title": "TrajectoryMatch",
+        "type": "object"
+      },
+      "TrajectoryMatchMode": {
+        "enum": [
+          "geographic",
+          "shape"
+        ],
+        "title": "TrajectoryMatchMode",
+        "type": "string"
+      },
+      "TrajectoryMatchRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "filters": {
+            "$ref": "#/components/schemas/TrajectoryFilters"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/TrajectoryMatchMode"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/GeoPoint"
+            },
+            "maxItems": 512,
+            "minItems": 2,
+            "title": "Points",
+            "type": "array"
+          },
+          "top_k": {
+            "default": 5,
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Top K",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "points"
+        ],
+        "title": "TrajectoryMatchRequest",
+        "type": "object"
+      },
+      "TrajectoryMatchResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data_status": {
+            "const": "algorithmic_result",
+            "default": "algorithmic_result",
+            "title": "Data Status",
+            "type": "string"
+          },
+          "elapsed_ms": {
+            "minimum": 0,
+            "title": "Elapsed Ms",
+            "type": "number"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryMatch"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/TrajectoryMatchMode"
+          },
+          "normalized_point_count": {
+            "default": 64,
+            "maximum": 512,
+            "minimum": 2,
+            "title": "Normalized Point Count",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "items",
+          "elapsed_ms"
+        ],
+        "title": "TrajectoryMatchResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WindFrame": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "height": {
+            "maximum": 10000,
+            "minimum": 2,
+            "title": "Height",
+            "type": "integer"
+          },
+          "missing_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Missing Value"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          },
+          "u": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "U",
+            "type": "array"
+          },
+          "v": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "V",
+            "type": "array"
+          },
+          "width": {
+            "maximum": 10000,
+            "minimum": 2,
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_id",
+          "time",
+          "width",
+          "height",
+          "u",
+          "v"
+        ],
+        "title": "WindFrame",
+        "type": "object"
+      },
+      "WindFrameReference": {
+        "additionalProperties": false,
+        "properties": {
+          "byte_size": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Byte Size"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sha256"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "url"
+        ],
+        "title": "WindFrameReference",
+        "type": "object"
+      },
+      "WindManifest": {
+        "additionalProperties": false,
+        "properties": {
+          "bounds": {
+            "$ref": "#/components/schemas/GeoBounds"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "dataset_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/components/schemas/WindFrameReference"
+            },
+            "minItems": 1,
+            "title": "Frames",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "grid_order": {
+            "const": "north_to_south_west_to_east_row_major",
+            "default": "north_to_south_west_to_east_row_major",
+            "title": "Grid Order",
+            "type": "string"
+          },
+          "height": {
+            "maximum": 10000,
+            "minimum": 2,
+            "title": "Height",
+            "type": "integer"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/WindMode"
+          },
+          "resolution_degrees": {
+            "exclusiveMinimum": 0,
+            "maximum": 5,
+            "title": "Resolution Degrees",
+            "type": "number"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "storm_id": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Storm Id"
+          },
+          "units": {
+            "const": "m/s",
+            "default": "m/s",
+            "title": "Units",
+            "type": "string"
+          },
+          "width": {
+            "maximum": 10000,
+            "minimum": 2,
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "data_status",
+          "dataset_id",
+          "mode",
+          "bounds",
+          "resolution_degrees",
+          "width",
+          "height",
+          "frames"
+        ],
+        "title": "WindManifest",
+        "type": "object"
+      },
+      "WindMode": {
+        "enum": [
+          "global",
+          "storm"
+        ],
+        "title": "WindMode",
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "description": "高影响热带气旋可视分析与台湾设施情景系统的本地 API 骨架。",
+    "title": "CycloneScope API",
+    "version": "0.1.0-local"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/data-sources": {
+      "get": {
+        "operationId": "data_sources_api_data_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSourceListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Data Sources",
+        "tags": [
+          "data"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/scenarios": {
+      "get": {
+        "operationId": "list_scenarios_api_scenarios_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioRead"
+                  },
+                  "title": "Response List Scenarios Api Scenarios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Scenarios",
+        "tags": [
+          "scenarios"
+        ]
+      },
+      "post": {
+        "operationId": "create_scenario_api_scenarios_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/api/scenarios/{scenario_id}/evaluate": {
+      "post": {
+        "operationId": "evaluate_scenario_api_scenarios__scenario_id__evaluate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Evaluate Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/api/scenarios/{scenario_id}/facilities": {
+      "post": {
+        "operationId": "add_facility_api_scenarios__scenario_id__facilities_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacilityCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Facility",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/api/storms": {
+      "get": {
+        "operationId": "storms_api_storms_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "basin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Basin"
+            }
+          },
+          {
+            "in": "query",
+            "name": "classic",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Classic"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "required": false,
+            "schema": {
+              "default": "impact_score",
+              "pattern": "^(impact_score|season|max_wind_ms)$",
+              "title": "Sort By",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StormCatalogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Storms",
+        "tags": [
+          "storms"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}": {
+      "get": {
+        "operationId": "storm_detail_api_storms__storm_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StormDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Storm Detail",
+        "tags": [
+          "storms"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}/impact/summary": {
+      "get": {
+        "operationId": "storm_impact_api_storms__storm_id__impact_summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StormImpactResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Storm Impact",
+        "tags": [
+          "impact"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}/track": {
+      "get": {
+        "operationId": "storm_track_api_storms__storm_id__track_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StormTrackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Storm Track",
+        "tags": [
+          "storms"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}/wind/manifest": {
+      "get": {
+        "operationId": "wind_manifest_api_storms__storm_id__wind_manifest_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindManifest"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Wind Manifest",
+        "tags": [
+          "wind"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}/wind/sample-frame": {
+      "get": {
+        "operationId": "sample_wind_frame_api_storms__storm_id__wind_sample_frame_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindFrame"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sample Wind Frame",
+        "tags": [
+          "wind"
+        ]
+      }
+    }
+  }
+}

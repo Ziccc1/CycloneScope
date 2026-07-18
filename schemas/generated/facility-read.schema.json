@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "CapacityUnit": {
+      "enum": [
+        "people",
+        "beds",
+        "teams",
+        "people_day"
+      ],
+      "title": "CapacityUnit",
+      "type": "string"
+    },
+    "FacilityType": {
+      "enum": [
+        "shelter",
+        "medical",
+        "rescue",
+        "warehouse"
+      ],
+      "title": "FacilityType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "budget_points": {
+      "anyOf": [
+        {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget Points"
+    },
+    "capacity_unit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CapacityUnit"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "capacity_value": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capacity Value"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "is_simulated": {
+      "title": "Is Simulated",
+      "type": "boolean"
+    },
+    "lat": {
+      "maximum": 90,
+      "minimum": -90,
+      "title": "Lat",
+      "type": "number"
+    },
+    "lon": {
+      "maximum": 180,
+      "minimum": -180,
+      "title": "Lon",
+      "type": "number"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "service_radius_km": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 200,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Service Radius Km"
+    },
+    "type": {
+      "$ref": "#/$defs/FacilityType"
+    }
+  },
+  "required": [
+    "type",
+    "lon",
+    "lat",
+    "id",
+    "scenario_id",
+    "is_simulated"
+  ],
+  "title": "FacilityRead",
+  "type": "object"
+}

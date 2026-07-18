@@ -1,0 +1,342 @@
+{
+  "$defs": {
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    },
+    "ImpactGridFeature": {
+      "additionalProperties": false,
+      "properties": {
+        "geometry": {
+          "discriminator": {
+            "mapping": {
+              "MultiPolygon": "#/$defs/MultiPolygonGeometry",
+              "Polygon": "#/$defs/PolygonGeometry"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PolygonGeometry"
+            },
+            {
+              "$ref": "#/$defs/MultiPolygonGeometry"
+            }
+          ],
+          "title": "Geometry"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
+        "properties": {
+          "$ref": "#/$defs/ImpactGridProperties"
+        },
+        "type": {
+          "const": "Feature",
+          "default": "Feature",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "geometry",
+        "properties"
+      ],
+      "title": "ImpactGridFeature",
+      "type": "object"
+    },
+    "ImpactGridProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "cell_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Cell Id",
+          "type": "string"
+        },
+        "contributing_storm_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contributing Storm Ids",
+          "type": "array"
+        },
+        "data_status": {
+          "$ref": "#/$defs/DataStatus"
+        },
+        "exposed_population": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exposed Population"
+        },
+        "hazard_index": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hazard Index"
+        },
+        "max_wind_ms": {
+          "anyOf": [
+            {
+              "maximum": 150,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Wind Ms"
+        },
+        "population": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Population"
+        },
+        "precip_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Precip Mm"
+        },
+        "reported_damage_price_year": {
+          "anyOf": [
+            {
+              "maximum": 2200,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported Damage Price Year"
+        },
+        "reported_damage_usd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported Damage Usd"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "time_end": {
+          "format": "date-time",
+          "title": "Time End",
+          "type": "string"
+        },
+        "time_start": {
+          "format": "date-time",
+          "title": "Time Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cell_id",
+        "time_start",
+        "time_end",
+        "data_status"
+      ],
+      "title": "ImpactGridProperties",
+      "type": "object"
+    },
+    "MultiPolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "default": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "MultiPolygonGeometry",
+      "type": "object"
+    },
+    "PolygonGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "default": "Polygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "PolygonGeometry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
+    "features": {
+      "items": {
+        "$ref": "#/$defs/ImpactGridFeature"
+      },
+      "title": "Features",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "metric": {
+      "enum": [
+        "hazard_index",
+        "max_wind_ms",
+        "precip_mm",
+        "population",
+        "exposed_population",
+        "reported_damage_usd"
+      ],
+      "title": "Metric",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "type": {
+      "const": "FeatureCollection",
+      "default": "FeatureCollection",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data_status",
+    "features",
+    "metric"
+  ],
+  "title": "ImpactGridCollection",
+  "type": "object"
+}

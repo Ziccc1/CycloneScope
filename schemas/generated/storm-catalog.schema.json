@@ -1,0 +1,262 @@
+{
+  "$defs": {
+    "Basin": {
+      "enum": [
+        "NA",
+        "SA",
+        "WP",
+        "EP",
+        "NI",
+        "SI",
+        "SP",
+        "AU",
+        "XX"
+      ],
+      "title": "Basin",
+      "type": "string"
+    },
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    },
+    "StormSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "ace": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ace"
+        },
+        "basin": {
+          "$ref": "#/$defs/Basin"
+        },
+        "classic": {
+          "default": false,
+          "title": "Classic",
+          "type": "boolean"
+        },
+        "classic_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Classic Rank"
+        },
+        "data_status": {
+          "$ref": "#/$defs/DataStatus"
+        },
+        "duration_hours": {
+          "minimum": 0,
+          "title": "Duration Hours",
+          "type": "number"
+        },
+        "end_time": {
+          "format": "date-time",
+          "title": "End Time",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "impact_available": {
+          "default": false,
+          "title": "Impact Available",
+          "type": "boolean"
+        },
+        "impact_score": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Impact Score"
+        },
+        "landfall_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Landfall Count",
+          "type": "integer"
+        },
+        "max_wind_ms": {
+          "anyOf": [
+            {
+              "maximum": 150,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Wind Ms"
+        },
+        "min_pressure_hpa": {
+          "anyOf": [
+            {
+              "maximum": 1100,
+              "minimum": 800,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Pressure Hpa"
+        },
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "reported_damage_usd_2024": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported Damage Usd 2024"
+        },
+        "reported_deaths": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported Deaths"
+        },
+        "score_coverage": {
+          "default": 0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score Coverage",
+          "type": "number"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1840,
+          "title": "Season",
+          "type": "integer"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "start_time": {
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        },
+        "wind_available": {
+          "default": false,
+          "title": "Wind Available",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "season",
+        "basin",
+        "start_time",
+        "end_time",
+        "duration_hours",
+        "data_status"
+      ],
+      "title": "StormSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "count": {
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/StormSummary"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "data_status",
+    "items",
+    "count"
+  ],
+  "title": "StormCatalogResponse",
+  "type": "object"
+}

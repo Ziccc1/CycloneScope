@@ -1,0 +1,216 @@
+{
+  "$defs": {
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    },
+    "GeoBounds": {
+      "additionalProperties": false,
+      "properties": {
+        "crosses_antimeridian": {
+          "default": false,
+          "title": "Crosses Antimeridian",
+          "type": "boolean"
+        },
+        "east": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "East",
+          "type": "number"
+        },
+        "north": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "North",
+          "type": "number"
+        },
+        "south": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "South",
+          "type": "number"
+        },
+        "west": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "West",
+          "type": "number"
+        }
+      },
+      "required": [
+        "west",
+        "south",
+        "east",
+        "north"
+      ],
+      "title": "GeoBounds",
+      "type": "object"
+    },
+    "WindFrameReference": {
+      "additionalProperties": false,
+      "properties": {
+        "byte_size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Byte Size"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "time": {
+          "format": "date-time",
+          "title": "Time",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "url"
+      ],
+      "title": "WindFrameReference",
+      "type": "object"
+    },
+    "WindMode": {
+      "enum": [
+        "global",
+        "storm"
+      ],
+      "title": "WindMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bounds": {
+      "$ref": "#/$defs/GeoBounds"
+    },
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
+    "dataset_id": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "frames": {
+      "items": {
+        "$ref": "#/$defs/WindFrameReference"
+      },
+      "minItems": 1,
+      "title": "Frames",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "grid_order": {
+      "const": "north_to_south_west_to_east_row_major",
+      "default": "north_to_south_west_to_east_row_major",
+      "title": "Grid Order",
+      "type": "string"
+    },
+    "height": {
+      "maximum": 10000,
+      "minimum": 2,
+      "title": "Height",
+      "type": "integer"
+    },
+    "mode": {
+      "$ref": "#/$defs/WindMode"
+    },
+    "resolution_degrees": {
+      "exclusiveMinimum": 0,
+      "maximum": 5,
+      "title": "Resolution Degrees",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "storm_id": {
+      "anyOf": [
+        {
+          "maxLength": 40,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Storm Id"
+    },
+    "units": {
+      "const": "m/s",
+      "default": "m/s",
+      "title": "Units",
+      "type": "string"
+    },
+    "width": {
+      "maximum": 10000,
+      "minimum": 2,
+      "title": "Width",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "data_status",
+    "dataset_id",
+    "mode",
+    "bounds",
+    "resolution_degrees",
+    "width",
+    "height",
+    "frames"
+  ],
+  "title": "WindManifest",
+  "type": "object"
+}

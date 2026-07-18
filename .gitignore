@@ -1,0 +1,41 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.test-artifacts/
+.test-runs/
+.coverage
+htmlcov/
+
+# Runtime data
+backend/data/*.db
+backend/data/*.db-*
+backend/data/raw/
+backend/data/processed/
+backend/data/cache/
+
+# Large geospatial/weather files
+*.nc
+*.nc4
+*.grib
+*.grib2
+*.tif
+*.tiff
+*.pmtiles
+*.mbtiles
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+!.env.example
