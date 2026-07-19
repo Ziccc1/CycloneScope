@@ -1,6 +1,34 @@
 {
+  "$defs": {
+    "DataStatus": {
+      "enum": [
+        "observed",
+        "reanalysis",
+        "reported",
+        "modeled",
+        "mixed",
+        "synthetic_fixture",
+        "synthetic_demo",
+        "algorithmic_result",
+        "scenario_model"
+      ],
+      "title": "DataStatus",
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
   "properties": {
+    "data_mode": {
+      "enum": [
+        "fixture",
+        "processed"
+      ],
+      "title": "Data Mode",
+      "type": "string"
+    },
+    "data_status": {
+      "$ref": "#/$defs/DataStatus"
+    },
     "database": {
       "const": "sqlite",
       "title": "Database",
@@ -30,7 +58,9 @@
     "service",
     "version",
     "database",
-    "sample_data"
+    "sample_data",
+    "data_mode",
+    "data_status"
   ],
   "title": "HealthResponse",
   "type": "object"

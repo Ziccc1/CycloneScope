@@ -129,3 +129,5 @@ class HealthResponse(ContractModel):
     version: str
     database: Literal["sqlite"]
     sample_data: bool
+    data_mode: Literal["fixture", "processed"]
+    data_status: DataStatus

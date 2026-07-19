@@ -14,7 +14,18 @@ try {
 
     Push-Location $FrontendRoot
     try {
-        & npm.cmd run generate:types
+        $Npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
+        $Node = Get-Command node -ErrorAction SilentlyContinue
+        if ($Npm) {
+            & $Npm.Source run generate:types
+        }
+        elseif ($Node -and (Test-Path ".\node_modules\openapi-typescript\bin\cli.js")) {
+            & $Node.Source .\node_modules\openapi-typescript\bin\cli.js `
+                ..\schemas\generated\openapi.json -o .\src\types\api.generated.ts
+        }
+        else {
+            throw "Missing frontend tooling. Install Node.js, then run .\scripts\bootstrap-frontend.ps1."
+        }
         if ($LASTEXITCODE -ne 0) { throw "TypeScript contract generation failed (exit code $LASTEXITCODE)." }
     }
     finally {
