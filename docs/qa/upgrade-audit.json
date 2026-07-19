@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "status": "pass_with_pending_external_sources",
+  "checks": {
+    "classic16_exposure": {
+      "rows": 48,
+      "storms": 16,
+      "modeled_rows": 15,
+      "no_hazard_rows": 33,
+      "all_classic_ids_present": true
+    },
+    "zone_population": {
+      "zones": 22,
+      "worldpop_sum": 23158483.060546875,
+      "official_admin_zones": 22,
+      "status": "official_statistical_population_joined_with_transparent_boundary_fallback"
+    },
+    "facilities_all": {
+      "rows": 6417,
+      "types": {
+        "medical": 464,
+        "shelter": 5953
+      },
+      "unique_ids": 6417
+    },
+    "reported_impact": {
+      "path_exists": true,
+      "rows": 2159,
+      "status": "loaded_emdat_public_table"
+    },
+    "era5_capability": {
+      "schema_version": "1.0",
+      "items": [
+        {
+          "storm_id": "1980214N11330",
+          "name": "ALLEN",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": false,
+          "has_static": true,
+          "modes": [
+            "static_comparison"
+          ]
+        },
+        {
+          "storm_id": "1988253N12306",
+          "name": "GILBERT",
+          "era5_available": false,
+          "era5_file_count": 0,
+          "has_dynamic": false,
+          "has_static": false,
+          "modes": []
+        },
+        {
+          "storm_id": "2005236N23285",
+          "name": "KATRINA",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2017260N12310",
+          "name": "MARIA",
+          "era5_available": false,
+          "era5_file_count": 0,
+          "has_dynamic": false,
+          "has_static": false,
+          "modes": []
+        },
+        {
+          "storm_id": "2019236N10314",
+          "name": "DORIAN",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": false,
+          "has_static": true,
+          "modes": [
+            "static_comparison"
+          ]
+        },
+        {
+          "storm_id": "2015293N13266",
+          "name": "PATRICIA",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2008117N11090",
+          "name": "NARGIS",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": false,
+          "has_static": true,
+          "modes": [
+            "static_comparison"
+          ]
+        },
+        {
+          "storm_id": "2019063S18038",
+          "name": "IDAI",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2023036S12117",
+          "name": "FREDDY",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": false,
+          "has_static": true,
+          "modes": [
+            "static_comparison"
+          ]
+        },
+        {
+          "storm_id": "2011028S13180",
+          "name": "YASI",
+          "era5_available": false,
+          "era5_file_count": 0,
+          "has_dynamic": false,
+          "has_static": false,
+          "modes": []
+        },
+        {
+          "storm_id": "2014004S17183",
+          "name": "IAN",
+          "era5_available": false,
+          "era5_file_count": 0,
+          "has_dynamic": false,
+          "has_static": false,
+          "modes": []
+        },
+        {
+          "storm_id": "2009215N20133",
+          "name": "MORAKOT",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "1996203N12152",
+          "name": "HERB",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2010256N17137",
+          "name": "FANAPI",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2015211N13162",
+          "name": "SOUDELOR",
+          "era5_available": true,
+          "era5_file_count": 2,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        },
+        {
+          "storm_id": "2013306N07162",
+          "name": "HAIYAN",
+          "era5_available": true,
+          "era5_file_count": 1,
+          "has_dynamic": true,
+          "has_static": false,
+          "modes": [
+            "full_animation"
+          ]
+        }
+      ],
+      "policy": "front-end checks era5_available and has_dynamic before animation"
+    },
+    "roads": {
+      "status": "official_centerline_processed",
+      "current_coverage_method": "network_travel_time",
+      "nodes": 540057,
+      "edges": 1097864,
+      "service_area_rows": 15699,
+      "thresholds_min": [
+        10,
+        20,
+        30
+      ]
+    }
+  }
+}

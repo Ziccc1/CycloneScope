@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "files_expected": 22,
+  "files_present": 22,
+  "rows": 138179,
+  "unique_stat_zones": 138179,
+  "reference_dates": [
+    "2024-12-01"
+  ],
+  "missing_population_rows": 0
+}

@@ -1,0 +1,9 @@
+{
+  "data_version": "a8-final-2026.07.19",
+  "generated_at": "2026-07-19T12:03:18.122312Z",
+  "status": "pass",
+  "primary_population": "WorldPop Global2 R2025A 2025",
+  "primary_tracks": "IBTrACS v04r01 since1980; WP subset for regional analysis",
+  "synthetic_data_policy": "demo fixtures are excluded from primary handoff",
+  "qa": "output/qa/a8-final-audit.json"
+}
