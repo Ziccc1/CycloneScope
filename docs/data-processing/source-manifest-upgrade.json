@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "records": [
+    {
+      "id": "emdat_public_table",
+      "dataset": "EM-DAT Public Table",
+      "url": "https://doc.emdat.be/docs/data-structure-and-content/emdat-public-table/",
+      "license": "EM-DAT public data terms; verify current access conditions",
+      "target_path": "input/raw/impact/emdat_public_table.csv",
+      "status": "downloaded",
+      "raw_path": "input/raw/impact/emdat_public_table.xlsx",
+      "bytes": 1803263,
+      "sha256": "4A7030A070A7070E8A7AF6A02D13E4A5E185CEDE71E88649CCE695F2E922E19A"
+    },
+    {
+      "id": "tce_dat",
+      "dataset": "TCE-DAT tropical cyclone exposure",
+      "url": "https://doi.org/10.5880/pik.2017.005",
+      "license": "CC BY 4.0",
+      "status": "downloaded",
+      "target_path": "input/raw/impact/tce_dat/",
+      "source_files": [
+        "input/raw/impact/tce_dat/TCE-DAT_2015-exposure_1950-2015.csv",
+        "input/raw/impact/tce_dat/TCE-DAT_historic-exposure_1950-2015.csv"
+      ],
+      "sha256": [
+        "0B5C0B2EAD7A62D1F3089C0CC1EF4EBB56968F4969D0E7BF22A110D7A32D9967",
+        "0A697ED7F8E0706133850D488E90207B7B8E58F8C1BB1443F4D5E5BB43FFE726"
+      ]
+    },
+    {
+      "id": "taiwan_statistical_population",
+      "dataset": "Taiwan population statistics by statistical area",
+      "url": "https://data.gov.tw/en/datasets/18681",
+      "license": "Open Government Data License v1.0",
+      "status": "downloaded_official_xml",
+      "target_path": "input/raw/taiwan/statistical_population/",
+      "source_files": "input/raw/taiwan/statistical_population/smallest-01.xml..smallest-22.xml",
+      "reference_date": "2024-12-01",
+      "rows": 138179,
+      "boundary_dataset": "https://data.gov.tw/dataset/25128",
+      "boundary_features": 156478,
+      "joined_population_rows": 136724
+    },
+    {
+      "id": "taiwan_osm",
+      "dataset": "Geofabrik Taiwan OSM extract",
+      "url": "https://download.geofabrik.de/asia/taiwan.html",
+      "license": "OpenStreetMap ODbL 1.0",
+      "status": "official_centerline_fallback_processed",
+      "target_path": "input/raw/taiwan/roads/taiwan-latest.osm.pbf",
+      "bytes": 278913024,
+      "note": "Geofabrik PBF transfer remained corrupt; official centerline used for reproducible network",
+      "fallback_dataset": "https://data.gov.tw/en/datasets/73232",
+      "fallback_path": "input/raw/taiwan/roads/official-road-centerline.zip",
+      "fallback_status": "processed"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "reference_population_year": 2025,
+  "reference_population_variant": "WorldPop Global2 R2025A v1 constrained 100m",
+  "global_ibtracs_period": [
+    1980,
+    2026
+  ],
+  "wp_ibtracs_period": [
+    1884,
+    2026
+  ],
+  "global_storm_count": 4943,
+  "wp_storm_count": 4232,
+  "classic_count": 16,
+  "era5_file_count": 19,
+  "era5_case_count": 12,
+  "era5_has_global_demo": true,
+  "primary_population_year": 2025,
+  "issues": [],
+  "status": "pass"
+}

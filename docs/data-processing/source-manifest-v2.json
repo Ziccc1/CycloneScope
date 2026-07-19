@@ -1,0 +1,124 @@
+﻿{
+    "schema_version":  "2.0",
+    "project":  "CycloneScope",
+    "generated_at":  "2026-07-19",
+    "records":  [
+                    {
+                        "id":  "ibtracs_wp",
+                        "dataset":  "NOAA IBTrACS v04r01 WP",
+                        "version":  "v04r01",
+                        "url":  "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.WP.list.v04r01.csv",
+                        "license":  "NOAA open data / IBTrACS terms",
+                        "downloaded_at":  "2026-07-18T16:10:03Z",
+                        "raw_path":  "input/raw/ibtracs/ibtracs.WP.list.v04r01.csv",
+                        "bytes":  113997757,
+                        "sha256":  "F0CED9E55B853E69495040EE7ED1747455CD932B0429E680FF7CC940EF5AD14D",
+                        "status":  "downloaded"
+                    },
+                    {
+                        "id":  "ibtracs_since1980",
+                        "dataset":  "NOAA IBTrACS v04r01 since1980",
+                        "version":  "v04r01",
+                        "url":  "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.since1980.list.v04r01.csv",
+                        "license":  "NOAA open data / IBTrACS terms",
+                        "downloaded_at":  "2026-07-19T03:17:06Z",
+                        "raw_path":  "input/raw/ibtracs/ibtracs.since1980.list.v04r01.csv",
+                        "bytes":  142982689,
+                        "sha256":  "9F3DB13F92BDC47D49EDCDEC677E64BAFE9F20C67529552A65A10882205BB7FE",
+                        "status":  "downloaded"
+                    },
+                    {
+                        "id":  "era5_single_levels",
+                        "dataset":  "Copernicus ERA5 hourly data on single levels",
+                        "version":  "current dataset, queried 2026-07-19",
+                        "url":  "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels",
+                        "license":  "Copernicus Licence; CDS account and dataset licence accepted",
+                        "downloaded_at":  "2026-07-19",
+                        "raw_path":  "output/processed/era5/downloads",
+                        "status":  "downloaded",
+                        "notes":  "18 regional NetCDF files plus one 2-degree global demo; u10/v10 in m/s; valid_time in UTC"
+                    },
+                    {
+                        "id":  "worldpop_twn",
+                        "dataset":  "WorldPop Taiwan population grid",
+                        "version":  "to be recorded at download",
+                        "url":  "https://hub.worldpop.org/doi/10.5258/SOTON/WP00262",
+                        "license":  "to be verified",
+                        "status":  "planned"
+                    },
+                    {
+                        "id":  "tw_zones",
+                        "dataset":  "Taiwan statistical/county boundaries",
+                        "version":  "to be recorded at download",
+                        "url":  "https://data.gov.tw/dataset/7442",
+                        "license":  "鏀垮簻璩囨枡闁嬫斁鎺堟瑠姊濇",
+                        "status":  "planned"
+                    },
+                    {
+                        "id":  "tw_shelters",
+                        "dataset":  "Taiwan emergency shelters",
+                        "version":  "to be recorded at download",
+                        "url":  "https://data.gov.tw/dataset/73242",
+                        "license":  "鏀垮簻璩囨枡闁嬫斁鎺堟瑠姊濇",
+                        "status":  "planned"
+                    },
+                    {
+                        "id":  "tw_medical",
+                        "dataset":  "Taiwan medical institutions",
+                        "version":  "to be recorded at download",
+                        "url":  "https://data.gov.tw/dataset/139250",
+                        "license":  "鏀垮簻璩囨枡闁嬫斁鎺堟瑠姊濇",
+                        "status":  "planned"
+                    },
+                    {
+                        "id":  "worldpop_taiwan_100m",
+                        "dataset":  "Taiwan 100m Population",
+                        "version":  "2010/2015 estimates, adjusted and unadjusted",
+                        "url":  "https://data.worldpop.org/GIS/Population/Individual_countries/TWN/Taiwan_100m_Population.7z",
+                        "license":  "Creative Commons Attribution 4.0 International",
+                        "downloaded_at":  "2026-07-19T04:58:48Z",
+                        "raw_path":  "input/raw/worldpop/Taiwan_100m_Population.7z",
+                        "bytes":  1862053,
+                        "sha256":  "39D8D3ED24E550AA3602A71837FF0D8EBD6F8BAAEF629A83688BCED76B4A81C8",
+                        "status":  "downloaded"
+                    },
+                    {
+                        "id":  "worldpop_taiwan_2020",
+                        "dataset":  "WorldPop Global 2000-2020 Taiwan 100m Population",
+                        "version":  "2020",
+                        "url":  "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/TWN/twn_ppp_2020.tif",
+                        "license":  "Creative Commons Attribution 4.0 International",
+                        "downloaded_at":  "2026-07-19T05:16:29Z",
+                        "raw_path":  "input/raw/worldpop/twn_ppp_2020.tif",
+                        "bytes":  26429322,
+                        "sha256":  "545816A8BA81DEA020901D31388578CB393F0D54E5F81E93E0373340ECE3F5DF",
+                        "status":  "downloaded"
+                    },
+                    {
+                        "id":  "worldpop_taiwan_2025_r2025a",
+                        "dataset":  "WorldPop Global2 R2025A Taiwan 100m Population",
+                        "version":  "R2025A v1, 2025",
+                        "url":  "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2025/TWN/v1/100m/constrained/twn_pop_2025_CN_100m_R2025A_v1.tif",
+                        "license":  "WorldPop licence / CC BY 4.0",
+                        "downloaded_at":  "2026-07-19T05:24:19Z",
+                        "raw_path":  "input/raw/worldpop/twn_pop_2025_R2025A_CN_100m.tif",
+                        "bytes":  9795141,
+                        "sha256":  "E963266859C6AA03C4E015E79BD62CCEB1800A894A1D84E6BFE4748EB2CD7E75",
+                        "status":  "downloaded",
+                        "notes":  "2025 Alpha release constructed September 2025; temporal series 2015-2030"
+                    },
+                    {
+                        "id":  "worldpop_taiwan_2020_r2025a",
+                        "dataset":  "WorldPop Global2 R2025A Taiwan 100m Population",
+                        "version":  "R2025A v1, 2020",
+                        "url":  "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/TWN/v1/100m/constrained/twn_pop_2020_CN_100m_R2025A_v1.tif",
+                        "license":  "WorldPop licence / CC BY 4.0",
+                        "downloaded_at":  "2026-07-19T05:26:54Z",
+                        "raw_path":  "input/raw/worldpop/twn_pop_2020_R2025A_CN_100m.tif",
+                        "bytes":  9868579,
+                        "sha256":  "83C7A582EBBF1A0B69E69111543F1A4194B0DE909FD975F3B5D8ABD5BD0BEED3",
+                        "status":  "downloaded",
+                        "notes":  "Same R2025A methodology as 2025 version"
+                    }
+                ]
+}
