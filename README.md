@@ -123,7 +123,6 @@ POST /api/scenarios/{scenario_id}/evaluate
 默认 `CYCLONESCOPE_DATA_MODE=fixture`，页面会持续显示夹具警告。正式数据由 A 放入 `backend/data/processed/` 后显式切换到 `processed`；MapLibre、真实粒子、手绘匹配算法和设施空间算法由 C 通过现有插槽与 service 接口接入。
 
 
-
 ## 数据处理交付
 
 完整的数据处理流程、来源、字段口径、质量限制和交付接口见 [`docs/data-processing/README.md`](docs/data-processing/README.md)。该目录只包含可重跑脚本、来源清单、QA 和接口契约；原始大数据文件不提交 Git。

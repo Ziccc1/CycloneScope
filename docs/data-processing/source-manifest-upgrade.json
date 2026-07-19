@@ -47,13 +47,14 @@
       "dataset": "Geofabrik Taiwan OSM extract",
       "url": "https://download.geofabrik.de/asia/taiwan.html",
       "license": "OpenStreetMap ODbL 1.0",
-      "status": "official_centerline_fallback_processed",
+      "status": "validated_osm_processed",
       "target_path": "input/raw/taiwan/roads/taiwan-latest.osm.pbf",
-      "bytes": 278913024,
-      "note": "Geofabrik PBF transfer remained corrupt; official centerline used for reproducible network",
+      "bytes": 325142938,
+      "note": "taiwan-260718.osm.pbf passed Osmium parsing validation; used for the primary network. Official centerline dataset 73232 retained as fallback.",
       "fallback_dataset": "https://data.gov.tw/en/datasets/73232",
       "fallback_path": "input/raw/taiwan/roads/official-road-centerline.zip",
-      "fallback_status": "processed"
+      "fallback_status": "processed",
+      "sha256": "EC8D901C4A8158EFC7E11F2A93D597F23629F59008D2C8055436264C727775C2"
     }
   ]
 }
