@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "errors": [],
+  "counts": {
+    "manifests": 13,
+    "frames": 665,
+    "impact_grids": 5
+  }
+}
