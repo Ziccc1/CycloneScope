@@ -135,7 +135,7 @@
       "bytes": 91821,
       "sha256": "A29FDEA13A011B471FF95EBFE02515FF1F49B398BD5CEDC1197B70E484AEA56F",
       "status": "downloaded",
-      "notes": "770 rescue/fire unit records; CP950 CSV; X/Y columns are longitude/latitude despite TWD97 labels."
+      "notes": "764 rescue/fire unit records; CP950 CSV; X/Y columns are longitude/latitude despite TWD97 labels."
     },
     {
       "id": "tw_emergency_centers_5969",
