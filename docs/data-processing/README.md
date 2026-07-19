@@ -10,7 +10,7 @@
 4. [CONTRACT-AUDIT-v2.1.md](CONTRACT-AUDIT-v2.1.md)：契约审计结果；
 5. [data-sources-final.md](data-sources-final.md)：来源、许可证、下载和版本清单。
 
-严格风暴目录位于 `catalog/storms-summary.json`。QA 报告位于 `pydantic-contract-validation.json` 以及本地生成目录 `output/qa/`。
+严格风暴目录位于 `catalog/storms-summary.json`。QA 报告位于 `pydantic-contract-validation.json`、`release-consistency-audit.json` 以及本地生成目录 `output/qa/`。
 
 原始文件和大型 Parquet、NetCDF、GeoTIFF、PBF 不提交 GitHub。B/C 不应自行扫描文件名；后端必须依据 `API-INDEX.json` 通过 adapter 输出 API，前端只消费 API、契约 GeoJSON、WindManifest 和 WindFrame。
 

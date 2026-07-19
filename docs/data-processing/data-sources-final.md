@@ -1,89 +1,65 @@
-# CycloneScope 最终数据源与处理状态
+# CycloneScope 最终数据源与处理状态 v2.1
 
-更新时间：2026-07-19  
-数据版本：a8-final-2026.07.19
+更新时间：2026-07-20  
+数据版本：a8-final-2026.07.19  
+契约版本：2.1
 
-本文件替代早期测试版 `data-sources.md`，按 A1-A8 实际处理结果重新整理。
+本文件是初始 `data-sources.md` 的最终修订版。实际交付以本文件、`DATA-PROCESSING-HANDOFF-v2.1.md`、`API-INDEX.json` 和 `DATA-CONTRACTS-v2.1.md` 为准。
 
-状态说明：
+## 一、已接入并完成处理
 
-- **已处理**：已下载、清洗并生成可交付文件；
-- **已处理但有限制**：可以使用，但前端必须展示口径和不确定性；
-- **备用**：保留为替代数据源；
-- **未接入**：初始清单中存在，但目前没有进入正式处理链路。
-
-## 1. 已接入并完成处理
-
-| 数据源 | 官方地址 | 原始数据/处理后目录 | 状态与说明 |
+| 数据源 | 地址 | 处理结果 | 最终状态 |
 |---|---|---|---|
-| NOAA IBTrACS 全球 since1980 | https://www.ncei.noaa.gov/products/international-best-track-archive | `input/raw/ibtracs/` → `output/processed/ibtracs-global-since1980/` | 已处理；全球比较主数据 |
-| NOAA IBTrACS WP | https://www.ncei.noaa.gov/products/international-best-track-archive | `input/raw/ibtracs/` → `output/processed/ibtracs-wp-since1980/` | 已处理；西北太平洋深入分析 |
-| Copernicus ERA5 single levels | https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels | `output/processed/era5/downloads/` | 已处理；u10/v10，18 个区域文件和 1 个全球演示窗 |
-| EM-DAT Public Table | https://doc.emdat.be/docs/data-structure-and-content/emdat-public-table/ | `input/raw/impact/emdat_public_table.xlsx` → `output/processed/impact/reported/` | 已处理；报告灾损，经济损失保留原始货币年份 |
-| TCE-DAT | https://doi.org/10.5880/pik.2017.005 | `input/raw/impact/tce_dat/` → `output/processed/impact/tce-dat/` | 已处理；模型估计暴露，不得与 EM-DAT 合并 |
-| WorldPop 2025 R2025A | https://data.worldpop.org/ | `input/raw/worldpop/` → `impact/exposure-2025-r2025a/` | 已处理；2025 情景人口，不是事件当年实测人口 |
-| WorldPop 2020 R2025A | https://data.worldpop.org/ | `input/raw/worldpop/` → `impact/exposure-2020-r2025a/` | 已处理；2020/2025 对照 |
-| 台湾统计区人口 | https://data.gov.tw/en/datasets/18681 | `input/raw/taiwan/statistical_population/` → `taiwan/population/statistical-zones-population-official.parquet` | 已处理；官方日期为 2024-12-01 |
-| 台湾最小统计区边界 | https://data.gov.tw/dataset/25128 | `input/raw/taiwan/statistical_zones/` → `taiwan/population/statistical-zones.geojson` | 已处理；19,754 条边界/人口代码不匹配记录保留 |
-| 台湾县市边界 | https://data.gov.tw/dataset/7442 | `input/raw/taiwan/` → `taiwan/zones.geojson` | 已处理；行政区汇总 |
-| 台湾避难收容处所 | https://data.gov.tw/dataset/73242 | `input/raw/taiwan/facilities/` → `taiwan/facilities/shelters.parquet` | 已处理；5,953 条，不代表实时开放状态 |
-| 台湾医疗机构 | https://data.gov.tw/dataset/139250 | API 分区查询 → `taiwan/facilities/medical/` | 已处理但有限制；464 条去重结果，不是全国完整清单 |
-| 台湾 OSM / Geofabrik PBF | https://download.geofabrik.de/asia/taiwan.html | `input/raw/taiwan/roads/taiwan-latest.osm.pbf` → `taiwan/roads/` | 已处理；Osmium 解析通过，SHA-256 已登记 |
+| NOAA IBTrACS 全球 since1980 | https://www.ncei.noaa.gov/products/international-best-track-archive | 4,943 场、300,007 个轨迹点；生成目录和轨迹 Parquet | 已接入 |
+| NOAA IBTrACS WP 子集 | https://www.ncei.noaa.gov/products/international-best-track-archive | 104,304 个轨迹点，用于西北太平洋深入分析 | 已接入 |
+| Copernicus ERA5 u10/v10 | https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels | 13 个契约 manifest、665 个压缩 frame；8 动态、4 静态、4 无风场 | 已接入，有能力限制 |
+| WorldPop 2025 R2025A | https://data.worldpop.org/ | 2025 情景人口暴露；不代表历史事件当年实际人口 | 已接入，有语义限制 |
+| EM-DAT Public Table | https://doc.emdat.be/docs/data-structure-and-content/emdat-public-table/ | 2,159 条报告灾损；经济损失保留原始货币和年份 | 已接入，有语义限制 |
+| TCE-DAT | https://doi.org/10.5880/pik.2017.005 | 32,079 条模型暴露；单独作为 historical_exposure | 已接入，有语义限制 |
+| 台湾官方统计区人口 | https://data.gov.tw/dataset/18681 | 138,179 条；参考日期为 2024-12-01 | 已接入，有日期限制 |
+| 台湾最小统计区边界 | https://data.gov.tw/dataset/25128 | 156,478 个边界；19,754 条代码不匹配保留在 QA | 部分完成 |
+| 台湾县市边界 | https://data.gov.tw/dataset/7442 | 22 个行政区契约 GeoJSON | 已接入 |
+| 台湾避难收容处所 | https://data.gov.tw/dataset/73242 | 5,953 条位置和容量 | 已接入，无实时状态 |
+| 台湾医疗设施 | https://data.gov.tw/dataset/139250 | 464 条 API 分区查询去重结果 | 已接入，但非全国完整清单 |
+| 台湾消防、救援与应变单位 | https://data.gov.tw/dataset/5969 | 764 条消防/救援单位 + 23 条应变中心，共 787 条 | 已接入 |
+| 台湾道路网络 | https://download.geofabrik.de/asia/taiwan.html | 3,722,291 个节点、7,597,166 条边 | 已接入 |
+| 道路服务区 | 台湾 OSM 道路网络处理结果 | 8,747 条 10/20/30 分钟静态服务区记录 | 已接入，有情景限制 |
 
-## 2. 当前道路网络版本
+## 二、保留但明确限制
 
-当前主版本使用已验证的 Geofabrik OSM PBF：
+### 1. 官方统计区人口空间连接
+官方人口文件已标准化，但边界版本和人口代码不完全一致。已匹配记录、未匹配记录和版本差异均保留，未按名称强行拼接。官方人口日期必须写为 `2024-12-01`，不能标成 2025。
 
-- 3,722,291 个节点；
-- 7,597,166 条有向边；
-- 8,747 条 10/20/30 分钟服务区记录；
-- 服务区使用有向图，保留单行道方向；
-- 缺少 OSM `maxspeed` 时使用道路等级默认速度；
-- 结果是静态道路网络估算，不是实时导航时间。
+### 2. EM-DAT 经济损失
+当前字段是原始货币、原始年份的名义金额，尚未完成统一通胀调整。因此不能直接制作跨年份公平的经济损失排名。若以后补充，必须另行确定基准年、CPI/平减指数和汇率规则。
 
-台湾官方道路中心线 dataset 73232：
+### 3. 道路服务时间
+部分道路速度来自道路等级默认值，字段已标记 `speed_source=default_by_road_class`。结果可用于设施方案比较和 10/20/30 分钟情景分析，不能称为实时导航或实时交通时间。
 
-- 地址：https://data.gov.tw/en/datasets/73232
-- 文件：`input/raw/taiwan/roads/official-road-centerline.zip`
-- 状态：备用数据源，已处理过但不是当前主版本。
+### 4. 影响与暴露口径
+- EM-DAT：报告灾损；
+- TCE-DAT：模型估计的历史暴露；
+- WorldPop：人口栅格与危险区域相交得到的情景暴露。
 
-## 3. 初始清单中尚未接入
+三者不能合并成一个“真实损失”指标。
 
-| 数据源/功能 | 地址 | 状态 | 说明 |
+## 三、后续扩展，不影响本次验收
+
+| 数据源/功能 | 地址 | 当前状态 | 原因 |
 |---|---|---|---|
-| 台湾避难所动态开放状态 | https://data.gov.tw/dataset/12849 | 未接入 | 当前只有设施位置和容量 |
-| 台湾消防、救援与应变单位 | https://data.gov.tw/dataset/5969 | 未接入 | 当前设施层只有避难所和医疗设施 |
-| Natural Earth 离线底图 | https://www.naturalearthdata.com/downloads/ | 未接入 | 前端可使用在线底图，离线部署时再下载 |
-| 洪水、滑坡、地震、热浪等多灾种数据 | 尚未确定统一来源 | 未接入 | 当前 hazard 只有台风最大风速和影响时间 |
-| 实时交通速度和道路封闭 | 无 | 未接入 | 当前道路速度是静态 OSM/default |
-| 官方统计区级人口空间连接 | data.gov.tw 18681/25128 | 部分完成 | 已保留匹配与未匹配记录，未强行按名称拼接 |
-| 经济损失通胀调整 | EM-DAT | 未完成 | 目前仍是原始货币和原始年份 |
+| 台湾避难所动态开放状态 | https://data.gov.tw/dataset/12849 | 后续扩展 | 需要时间化开放状态和事件时间对齐；当前已有位置和容量 |
+| Natural Earth 离线底图 | https://www.naturalearthdata.com/downloads/ | 后续扩展 | 在线底图已经满足展示，离线部署时再下载 |
+| 洪水、滑坡、地震、热浪等多灾种 | 尚未确定统一来源 | 后续扩展 | 当前项目主题冻结为热带气旋可视分析 |
+| 实时交通速度和道路封闭 | 无稳定统一来源 | 后续扩展 | 当前只有静态道路网络和情景速度 |
+| 16 场完整影响格网 | 多来源 | 后续扩展 | 当前事件格网覆盖 5/16 场，其他案例正确返回 `impact_available=false` |
 
-## 4. 不应混用的指标
+## 四、交付入口
 
-1. `EM-DAT reported_damage`：报告灾害死亡、受灾人口和经济损失。
-2. `TCE-DAT historical_exposure`：模型估计的气旋暴露人口和资产。
-3. `WorldPop exposure`：人口格网与危险区域相交得到的估计暴露。
-4. `Taiwan official population`：官方统计区人口，参考日期为 2024-12-01。
-5. `WorldPop 2025`：2025 情景人口估计，不是历史事件当年实际人口。
+- `API-INDEX.json`：数据集和契约路径唯一索引；
+- `DATA-PROCESSING-HANDOFF-v2.1.md`：完整处理流程、资源规模、字段和 API 定义；
+- `DATA-CONTRACTS-v2.1.md`：冻结字段契约；
+- `CONTRACT-AUDIT-v2.1.md`：契约审计结果；
+- `source-manifest-v2.json`、`source-manifest-upgrade.json`：来源、许可证、日期和哈希；
+- `catalog/storms-summary.json`：严格风暴目录。
 
-## 5. 正式交付文件
-
-- `output/processed/API-INDEX.json`
-- `output/processed/HANDOFF-CONTRACT-v1.md`
-- `output/processed/taiwan/roads/README.md`
-- `output/processed/taiwan/roads/network-qa.json`
-- `output/processed/taiwan/roads/service-area-qa.json`
-- `output/processed/DATA-QUALITY-ERRATA.md`
-- `source-manifest-upgrade.json`
-- `source-manifest-v2.json`
-
-完整处理流程：
-
-- `docs/data-processing.md`
-- `pipeline/README.md`
-- `docs/data-processing/README.md`
-
-## 6. 结论
-
-A1-A8 主数据处理链路已完成并通过最终审计。当前真正未完成的是动态设施状态、消防/救援设施、多灾种扩展、离线底图和前端/API 联调；这些内容不应在项目展示中描述为已经接入。
+前端不直接读取原始 CSV、NetCDF、GeoTIFF、PBF 或分析 Parquet；B 应通过 adapter 输出 API，C 只消费 API、契约 GeoJSON、WindManifest 和 WindFrame。
