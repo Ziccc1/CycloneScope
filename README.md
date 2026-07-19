@@ -24,6 +24,8 @@ GitHub description（288 characters）：
 - [工作包验证模板](docs/verification-template.md)：每个人提交前记录命令、预期/实际结果、证据和已知限制。
 - [数据来源](docs/data-sources.md)：正式数据来源和下载入口。
 - [第一阶段架构](docs/architecture.md)：当前 React/FastAPI/SQLite 骨架说明。
+- [B 运行与答辩手册](docs/b-runbook.md)：环境、启动、数据模式、API 烟测与离线检查。
+- [B 验证记录](docs/b-verification.md)：B1–B8 的自动与专项验证范围。
 
 ## 可执行数据契约
 
@@ -76,9 +78,8 @@ GitHub description（288 characters）：
 打开另一个 PowerShell：
 
 ```powershell
-cd frontend
-npm.cmd install
-npm.cmd run dev
+.\scripts\bootstrap-frontend.ps1
+.\scripts\start-frontend.ps1
 ```
 
 浏览器打开 <http://127.0.0.1:5173>。
@@ -102,16 +103,25 @@ GET  /api/storms/{storm_id}/track
 GET  /api/storms/{storm_id}/impact/summary
 GET  /api/storms/{storm_id}/wind/manifest
 GET  /api/storms/{storm_id}/wind/sample-frame
+GET  /api/wind/periods/{period_id}/manifest
+GET  /api/impact/grid
+GET  /api/taiwan/zones
+GET  /api/taiwan/facilities
+POST /api/trajectory-match
 
 POST /api/scenarios
 GET  /api/scenarios
+GET/PATCH/DELETE /api/scenarios/{scenario_id}
 POST /api/scenarios/{scenario_id}/facilities
+GET  /api/scenarios/{scenario_id}/facilities
+PATCH/DELETE /api/scenarios/{scenario_id}/facilities/{facility_id}
 POST /api/scenarios/{scenario_id}/evaluate
 ```
 
-## GitHub 状态
+## 当前 B 版本边界
 
-本地 Git 仓库已绑定远程地址 <https://github.com/Ziccc1/CycloneScope.git>。当前仍未创建本地提交，也未推送；完成本机联调并确认数据口径后，再创建首个版本提交并上传。
+默认 `CYCLONESCOPE_DATA_MODE=fixture`，页面会持续显示夹具警告。正式数据由 A 放入 `backend/data/processed/` 后显式切换到 `processed`；MapLibre、真实粒子、手绘匹配算法和设施空间算法由 C 通过现有插槽与 service 接口接入。
+
 
 
 ## 数据处理交付

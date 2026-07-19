@@ -652,6 +652,104 @@
         "title": "FacilityTypeEvaluation",
         "type": "object"
       },
+      "FacilityUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "budget_points": {
+            "anyOf": [
+              {
+                "maximum": 5,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Budget Points"
+          },
+          "capacity_unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CapacityUnit"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "capacity_value": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Capacity Value"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lon"
+          },
+          "service_radius_km": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 200,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Service Radius Km"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FacilityType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "title": "FacilityUpdate",
+        "type": "object"
+      },
       "GeoBounds": {
         "additionalProperties": false,
         "properties": {
@@ -733,6 +831,17 @@
       "HealthResponse": {
         "additionalProperties": false,
         "properties": {
+          "data_mode": {
+            "enum": [
+              "fixture",
+              "processed"
+            ],
+            "title": "Data Mode",
+            "type": "string"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
           "database": {
             "const": "sqlite",
             "title": "Database",
@@ -762,7 +871,9 @@
           "service",
           "version",
           "database",
-          "sample_data"
+          "sample_data",
+          "data_mode",
+          "data_status"
         ],
         "title": "HealthResponse",
         "type": "object"
@@ -1161,6 +1272,38 @@
         "title": "ScenarioCreate",
         "type": "object"
       },
+      "ScenarioDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "facilities": {
+            "items": {
+              "$ref": "#/components/schemas/FacilityRead"
+            },
+            "title": "Facilities",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "title": "ScenarioDetail",
+        "type": "object"
+      },
       "ScenarioRead": {
         "additionalProperties": false,
         "properties": {
@@ -1184,6 +1327,22 @@
           "created_at"
         ],
         "title": "ScenarioRead",
+        "type": "object"
+      },
+      "ScenarioUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ScenarioUpdate",
         "type": "object"
       },
       "StormCatalogResponse": {
@@ -2699,9 +2858,9 @@
     }
   },
   "info": {
-    "description": "高影响热带气旋可视分析与台湾设施情景系统的本地 API 骨架。",
+    "description": "高影响热带气旋可视分析与台湾设施情景系统的本地 API。",
     "title": "CycloneScope API",
-    "version": "0.1.0-local"
+    "version": "0.2.0-local"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -2744,6 +2903,119 @@
         "summary": "Health",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/impact/grid": {
+      "get": {
+        "operationId": "impact_grid_api_impact_grid_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "storm_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Storm Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Window Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "metric",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Metric"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bbox"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hazard_threshold",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hazard Threshold"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactGridCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Impact Grid",
+        "tags": [
+          "impact"
         ]
       }
     },
@@ -2811,6 +3083,131 @@
         ]
       }
     },
+    "/api/scenarios/{scenario_id}": {
+      "delete": {
+        "operationId": "delete_scenario_api_scenarios__scenario_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      },
+      "get": {
+        "operationId": "get_scenario_api_scenarios__scenario_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      },
+      "patch": {
+        "operationId": "update_scenario_api_scenarios__scenario_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
     "/api/scenarios/{scenario_id}/evaluate": {
       "post": {
         "operationId": "evaluate_scenario_api_scenarios__scenario_id__evaluate_post",
@@ -2864,6 +3261,50 @@
       }
     },
     "/api/scenarios/{scenario_id}/facilities": {
+      "get": {
+        "operationId": "list_facilities_api_scenarios__scenario_id__facilities_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FacilityRead"
+                  },
+                  "title": "Response List Facilities Api Scenarios  Scenario Id  Facilities Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Facilities",
+        "tags": [
+          "scenarios"
+        ]
+      },
       "post": {
         "operationId": "add_facility_api_scenarios__scenario_id__facilities_post",
         "parameters": [
@@ -2915,6 +3356,109 @@
         ]
       }
     },
+    "/api/scenarios/{scenario_id}/facilities/{facility_id}": {
+      "delete": {
+        "operationId": "delete_facility_api_scenarios__scenario_id__facilities__facility_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "facility_id",
+            "required": true,
+            "schema": {
+              "title": "Facility Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Facility",
+        "tags": [
+          "scenarios"
+        ]
+      },
+      "patch": {
+        "operationId": "update_facility_api_scenarios__scenario_id__facilities__facility_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "facility_id",
+            "required": true,
+            "schema": {
+              "title": "Facility Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacilityUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Facility",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
     "/api/storms": {
       "get": {
         "operationId": "storms_api_storms_get",
@@ -2949,6 +3493,76 @@
                 }
               ],
               "title": "Classic"
+            }
+          },
+          {
+            "in": "query",
+            "name": "season_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2200,
+                  "minimum": 1840,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Season From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "season_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2200,
+                  "minimum": 1840,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Season To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_wind_ms",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 150,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Wind Ms"
+            }
+          },
+          {
+            "in": "query",
+            "name": "landfall",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Landfall"
             }
           },
           {
@@ -3087,6 +3701,40 @@
               "title": "Storm Id",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End"
+            }
           }
         ],
         "responses": {
@@ -3114,6 +3762,57 @@
         "summary": "Storm Track",
         "tags": [
           "storms"
+        ]
+      }
+    },
+    "/api/storms/{storm_id}/wind/frames/{frame_name}": {
+      "get": {
+        "operationId": "wind_frame_api_storms__storm_id__wind_frames__frame_name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "storm_id",
+            "required": true,
+            "schema": {
+              "title": "Storm Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "frame_name",
+            "required": true,
+            "schema": {
+              "title": "Frame Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindFrame"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Wind Frame",
+        "tags": [
+          "wind"
         ]
       }
     },
@@ -3196,6 +3895,235 @@
           }
         },
         "summary": "Sample Wind Frame",
+        "tags": [
+          "wind"
+        ]
+      }
+    },
+    "/api/taiwan/facilities": {
+      "get": {
+        "operationId": "taiwan_facilities_api_taiwan_facilities_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FacilityType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "county_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "County Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bbox"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Taiwan Facilities",
+        "tags": [
+          "taiwan"
+        ]
+      }
+    },
+    "/api/taiwan/zones": {
+      "get": {
+        "operationId": "taiwan_zones_api_taiwan_zones_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "county_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "County Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bbox"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaiwanZoneCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Taiwan Zones",
+        "tags": [
+          "taiwan"
+        ]
+      }
+    },
+    "/api/trajectory-match": {
+      "post": {
+        "operationId": "trajectory_match_api_trajectory_match_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryMatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryMatchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trajectory Match",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/api/wind/periods/{period_id}/manifest": {
+      "get": {
+        "operationId": "period_wind_manifest_api_wind_periods__period_id__manifest_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "title": "Period Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindManifest"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Period Wind Manifest",
         "tags": [
           "wind"
         ]

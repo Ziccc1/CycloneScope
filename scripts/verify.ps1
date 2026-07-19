@@ -30,7 +30,22 @@ try {
     Write-Host "[3/3] Generating React types and running the production build..."
     Push-Location (Join-Path $ProjectRoot "frontend")
     try {
-        & npm.cmd run build
+        $Npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
+        $Node = Get-Command node -ErrorAction SilentlyContinue
+        if ($Npm) {
+            & $Npm.Source run build
+        }
+        elseif ($Node -and (Test-Path ".\node_modules\vite\bin\vite.js")) {
+            & $Node.Source .\node_modules\openapi-typescript\bin\cli.js `
+                ..\schemas\generated\openapi.json -o .\src\types\api.generated.ts
+            if ($LASTEXITCODE -ne 0) { throw "Type generation failed (exit code $LASTEXITCODE)." }
+            & $Node.Source .\node_modules\typescript\bin\tsc --noEmit
+            if ($LASTEXITCODE -ne 0) { throw "TypeScript check failed (exit code $LASTEXITCODE)." }
+            & $Node.Source .\node_modules\vite\bin\vite.js build
+        }
+        else {
+            throw "Missing frontend tooling. Install Node.js, then run .\scripts\bootstrap-frontend.ps1."
+        }
         if ($LASTEXITCODE -ne 0) { throw "Frontend build failed (exit code $LASTEXITCODE)." }
     }
     finally {

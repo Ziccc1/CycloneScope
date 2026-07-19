@@ -21,6 +21,10 @@ class ScenarioCreate(ContractModel):
     name: str = Field(min_length=1, max_length=120)
 
 
+class ScenarioUpdate(ContractModel):
+    name: str = Field(min_length=1, max_length=120)
+
+
 class ScenarioRead(ContractModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -63,6 +67,26 @@ class FacilityRead(FacilityCreate):
     id: str
     scenario_id: str
     is_simulated: bool
+
+
+class FacilityUpdate(ContractModel):
+    type: FacilityType | None = None
+    lon: float | None = Field(default=None, ge=-180, le=180)
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    capacity_value: int | None = Field(default=None, ge=0)
+    capacity_unit: CapacityUnit | None = None
+    service_radius_km: float | None = Field(default=None, gt=0, le=200)
+    budget_points: int | None = Field(default=None, ge=1, le=5)
+
+    @model_validator(mode="after")
+    def update_has_at_least_one_field(self) -> "FacilityUpdate":
+        if not self.model_fields_set:
+            raise ValueError("facility update requires at least one field")
+        return self
+
+
+class ScenarioDetail(ScenarioRead):
+    facilities: list[FacilityRead] = Field(default_factory=list)
 
 
 class EvaluationRequest(ContractModel):

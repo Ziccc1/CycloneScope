@@ -15,9 +15,12 @@ from .scenario import (
     EvaluationResponse,
     FacilityCreate,
     FacilityRead,
+    FacilityUpdate,
     FacilityTypeEvaluation,
     ScenarioCreate,
+    ScenarioDetail,
     ScenarioRead,
+    ScenarioUpdate,
 )
 from .sources import DataSource, DataSourceListResponse
 from .storm import (
@@ -66,6 +69,7 @@ __all__ = [
     "FacilityFeature",
     "FacilityProperties",
     "FacilityRead",
+    "FacilityUpdate",
     "FacilityType",
     "FacilityTypeEvaluation",
     "GeoBounds",
@@ -79,7 +83,9 @@ __all__ = [
     "PointGeometry",
     "PolygonGeometry",
     "ScenarioCreate",
+    "ScenarioDetail",
     "ScenarioRead",
+    "ScenarioUpdate",
     "StormCatalogResponse",
     "StormDetail",
     "StormImpact",
