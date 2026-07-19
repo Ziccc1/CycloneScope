@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/impact/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Impact Grid */
+        get: operations["impact_grid_api_impact_grid_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/scenarios": {
         parameters: {
             query?: never;
@@ -54,6 +71,25 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/scenarios/{scenario_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Scenario */
+        get: operations["get_scenario_api_scenarios__scenario_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Scenario */
+        delete: operations["delete_scenario_api_scenarios__scenario_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Scenario */
+        patch: operations["update_scenario_api_scenarios__scenario_id__patch"];
         trace?: never;
     };
     "/api/scenarios/{scenario_id}/evaluate": {
@@ -80,7 +116,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List Facilities */
+        get: operations["list_facilities_api_scenarios__scenario_id__facilities_get"];
         put?: never;
         /** Add Facility */
         post: operations["add_facility_api_scenarios__scenario_id__facilities_post"];
@@ -88,6 +125,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/scenarios/{scenario_id}/facilities/{facility_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Facility */
+        delete: operations["delete_facility_api_scenarios__scenario_id__facilities__facility_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Facility */
+        patch: operations["update_facility_api_scenarios__scenario_id__facilities__facility_id__patch"];
         trace?: never;
     };
     "/api/storms": {
@@ -158,6 +213,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storms/{storm_id}/wind/frames/{frame_name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Wind Frame */
+        get: operations["wind_frame_api_storms__storm_id__wind_frames__frame_name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/storms/{storm_id}/wind/manifest": {
         parameters: {
             query?: never;
@@ -184,6 +256,74 @@ export interface paths {
         };
         /** Sample Wind Frame */
         get: operations["sample_wind_frame_api_storms__storm_id__wind_sample_frame_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/taiwan/facilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Taiwan Facilities */
+        get: operations["taiwan_facilities_api_taiwan_facilities_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/taiwan/zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Taiwan Zones */
+        get: operations["taiwan_zones_api_taiwan_zones_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trajectory-match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Trajectory Match */
+        post: operations["trajectory_match_api_trajectory_match_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wind/periods/{period_id}/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Period Wind Manifest */
+        get: operations["period_wind_manifest_api_wind_periods__period_id__manifest_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -442,6 +582,38 @@ export interface components {
             modeled_reachable_population: number;
             type: components["schemas"]["FacilityType"];
         };
+        /** FacilityUpdate */
+        FacilityUpdate: {
+            /**
+             * Budget Points
+             * @default null
+             */
+            budget_points: number | null;
+            /** @default null */
+            capacity_unit: components["schemas"]["CapacityUnit"] | null;
+            /**
+             * Capacity Value
+             * @default null
+             */
+            capacity_value: number | null;
+            /**
+             * Lat
+             * @default null
+             */
+            lat: number | null;
+            /**
+             * Lon
+             * @default null
+             */
+            lon: number | null;
+            /**
+             * Service Radius Km
+             * @default null
+             */
+            service_radius_km: number | null;
+            /** @default null */
+            type: components["schemas"]["FacilityType"] | null;
+        };
         /** GeoBounds */
         GeoBounds: {
             /**
@@ -472,6 +644,12 @@ export interface components {
         };
         /** HealthResponse */
         HealthResponse: {
+            /**
+             * Data Mode
+             * @enum {string}
+             */
+            data_mode: "fixture" | "processed";
+            data_status: components["schemas"]["DataStatus"];
             /**
              * Database
              * @constant
@@ -646,6 +824,20 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** ScenarioDetail */
+        ScenarioDetail: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Facilities */
+            facilities?: components["schemas"]["FacilityRead"][];
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+        };
         /** ScenarioRead */
         ScenarioRead: {
             /**
@@ -655,6 +847,11 @@ export interface components {
             created_at: string;
             /** Id */
             id: string;
+            /** Name */
+            name: string;
+        };
+        /** ScenarioUpdate */
+        ScenarioUpdate: {
             /** Name */
             name: string;
         };
@@ -1341,6 +1538,41 @@ export interface operations {
             };
         };
     };
+    impact_grid_api_impact_grid_get: {
+        parameters: {
+            query?: {
+                storm_id?: string | null;
+                window_id?: string | null;
+                metric?: string | null;
+                bbox?: string | null;
+                hazard_threshold?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactGridCollection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_scenarios_api_scenarios_get: {
         parameters: {
             query?: never;
@@ -1394,6 +1626,101 @@ export interface operations {
             };
         };
     };
+    get_scenario_api_scenarios__scenario_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenarioDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_scenario_api_scenarios__scenario_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_scenario_api_scenarios__scenario_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScenarioUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenarioRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     evaluate_scenario_api_scenarios__scenario_id__evaluate_post: {
         parameters: {
             query?: never;
@@ -1416,6 +1743,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EvaluationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_facilities_api_scenarios__scenario_id__facilities_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacilityRead"][];
                 };
             };
             /** @description Validation Error */
@@ -1464,11 +1822,81 @@ export interface operations {
             };
         };
     };
+    delete_facility_api_scenarios__scenario_id__facilities__facility_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+                facility_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_facility_api_scenarios__scenario_id__facilities__facility_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+                facility_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FacilityUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacilityRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     storms_api_storms_get: {
         parameters: {
             query?: {
                 basin?: string | null;
                 classic?: boolean | null;
+                season_from?: number | null;
+                season_to?: number | null;
+                min_wind_ms?: number | null;
+                landfall?: boolean | null;
                 sort_by?: string;
             };
             header?: never;
@@ -1561,7 +1989,10 @@ export interface operations {
     };
     storm_track_api_storms__storm_id__track_get: {
         parameters: {
-            query?: never;
+            query?: {
+                start?: string | null;
+                end?: string | null;
+            };
             header?: never;
             path: {
                 storm_id: string;
@@ -1577,6 +2008,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StormTrackResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    wind_frame_api_storms__storm_id__wind_frames__frame_name__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                storm_id: string;
+                frame_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WindFrame"];
                 };
             };
             /** @description Validation Error */
@@ -1639,6 +2102,135 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WindFrame"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    taiwan_facilities_api_taiwan_facilities_get: {
+        parameters: {
+            query?: {
+                type?: components["schemas"]["FacilityType"] | null;
+                county_code?: string | null;
+                bbox?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacilityCollection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    taiwan_zones_api_taiwan_zones_get: {
+        parameters: {
+            query?: {
+                county_code?: string | null;
+                bbox?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaiwanZoneCollection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trajectory_match_api_trajectory_match_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrajectoryMatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrajectoryMatchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    period_wind_manifest_api_wind_periods__period_id__manifest_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WindManifest"];
                 };
             };
             /** @description Validation Error */

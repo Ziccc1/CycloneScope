@@ -81,6 +81,16 @@
       "model": "ScenarioRead"
     },
     {
+      "file": "scenario-update.schema.json",
+      "id": "scenario-update",
+      "model": "ScenarioUpdate"
+    },
+    {
+      "file": "scenario-detail.schema.json",
+      "id": "scenario-detail",
+      "model": "ScenarioDetail"
+    },
+    {
       "file": "facility-create.schema.json",
       "id": "facility-create",
       "model": "FacilityCreate"
@@ -89,6 +99,11 @@
       "file": "facility-read.schema.json",
       "id": "facility-read",
       "model": "FacilityRead"
+    },
+    {
+      "file": "facility-update.schema.json",
+      "id": "facility-update",
+      "model": "FacilityUpdate"
     },
     {
       "file": "evaluation-request.schema.json",
