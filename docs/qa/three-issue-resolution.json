@@ -1,0 +1,15 @@
+{
+  "boundary_features": 156478,
+  "population_matched": 136724,
+  "population_version_mismatch": 19754,
+  "service_area_rows": 15699,
+  "service_area_population_status": {
+    "official_statistical_area": 15699
+  },
+  "travel_time_quality": {
+    "low_default_speed": 15699
+  },
+  "era5_dynamic_cases": 8,
+  "era5_static_cases": 4,
+  "era5_unavailable_cases": 4
+}

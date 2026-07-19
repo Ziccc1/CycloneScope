@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0.0",
+  "data_version": "a8-final-2026.07.19",
+  "generated_at": "2026-07-19T12:03:18.122312Z",
+  "status": "pass",
+  "issues": [],
+  "checks": {
+    "A1": {
+      "manifest_records": 11,
+      "raw_integrity": [
+        {
+          "id": "ibtracs_wp",
+          "exists": true,
+          "bytes_actual": 113997757,
+          "bytes_manifest": 113997757,
+          "sha256_match": true
+        },
+        {
+          "id": "ibtracs_since1980",
+          "exists": true,
+          "bytes_actual": 142982689,
+          "bytes_manifest": 142982689,
+          "sha256_match": true
+        },
+        {
+          "id": "era5_single_levels",
+          "exists": true,
+          "path_type": "directory",
+          "file_count": 20
+        },
+        {
+          "id": "worldpop_taiwan_100m",
+          "exists": true,
+          "bytes_actual": 1862053,
+          "bytes_manifest": 1862053,
+          "sha256_match": true
+        },
+        {
+          "id": "worldpop_taiwan_2020",
+          "exists": true,
+          "bytes_actual": 26429322,
+          "bytes_manifest": 26429322,
+          "sha256_match": true
+        },
+        {
+          "id": "worldpop_taiwan_2025_r2025a",
+          "exists": true,
+          "bytes_actual": 9795141,
+          "bytes_manifest": 9795141,
+          "sha256_match": true
+        },
+        {
+          "id": "worldpop_taiwan_2020_r2025a",
+          "exists": true,
+          "bytes_actual": 9868579,
+          "bytes_manifest": 9868579,
+          "sha256_match": true
+        }
+      ],
+      "all_declared_raw_present": true
+    },
+    "A1_upgrade": {
+      "records": 4,
+      "sources": [
+        {
+          "id": "emdat_public_table",
+          "status": "downloaded",
+          "declared_files": 0,
+          "files_present": 0
+        },
+        {
+          "id": "tce_dat",
+          "status": "downloaded",
+          "declared_files": 2,
+          "files_present": 2
+        },
+        {
+          "id": "taiwan_statistical_population",
+          "status": "downloaded_official_xml",
+          "declared_files": 1,
+          "files_present": 0
+        },
+        {
+          "id": "taiwan_osm",
+          "status": "official_centerline_fallback_processed",
+          "declared_files": 0,
+          "files_present": 0
+        }
+      ]
+    },
+    "A2": {
+      "global-since1980": {
+        "storms": 4943,
+        "unique_storm_ids": 4943,
+        "track_rows": 300007,
+        "track_storms": 4943,
+        "duplicate_storm_ids": 0,
+        "null_coordinates": 0
+      },
+      "wp-since1980": {
+        "storms": 1515,
+        "unique_storm_ids": 1515,
+        "track_rows": 104304,
+        "track_storms": 1515,
+        "duplicate_storm_ids": 0,
+        "null_coordinates": 0
+      }
+    },
+    "A3": {
+      "classic_count": 16,
+      "item_count": 16,
+      "unique_ids": 16
+    },
+    "A4": {
+      "frame_manifest_exists": true,
+      "download_manifest_exists": true,
+      "era5_case_count": 16
+    },
+    "A5": {
+      "primary_population": "WorldPop Global2 R2025A 2025 constrained 100m",
+      "population_summary_exists": true,
+      "exposure_exists": true,
+      "hazard_max_exists": true,
+      "hazard_time_exists": true
+    },
+    "A6": {
+      "shelter_count": 5953,
+      "shelter_zone_match_rate": 1.0,
+      "medical_count": 464,
+      "medical_zone_match_rate": 1.0,
+      "crs": "EPSG:4326",
+      "shelter_unique_id": 5953,
+      "medical_unique_id": 464,
+      "shelter_unmatched_zone_count": 0,
+      "shelter_unmatched_by_admin": {},
+      "null_capacity_count": 0,
+      "null_coordinates_count": 0,
+      "medical_null_coordinates_count": 0,
+      "note": "67 previously unmatched shelters assigned to nearest ADM1 polygon in 3826 projected CRS",
+      "contract_exists": true
+    },
+    "A7": {
+      "global": {
+        "schema_version": "1.0",
+        "source_tracks": "output\\processed\\ibtracs-global-since1980\\tracks\\track-points.parquet",
+        "storm_count_input": 4943,
+        "storm_count_output": 4932,
+        "classic_requested": 16,
+        "classic_present": 16,
+        "classic_missing": [],
+        "point_count": 64,
+        "bad_storm_count": 11,
+        "bad_storm_ids": [
+          "1981054S12181",
+          "1982237N26080",
+          "1983227N15142",
+          "1983243N11184",
+          "1984248N27180",
+          "1988161N21089",
+          "1988275N18085",
+          "1989171N11088",
+          "1989287N11259",
+          "1989315N11084",
+          "2019209N11237"
+        ],
+        "all_feature_lengths_64": true,
+        "finite_shape_values": true,
+        "duplicate_storm_ids": 0,
+        "crs": "EPSG:4326"
+      },
+      "wp": {
+        "schema_version": "1.0",
+        "source_tracks": "output\\processed\\ibtracs-wp-since1980\\tracks\\track-points.parquet",
+        "storm_count_input": 1515,
+        "storm_count_output": 1514,
+        "classic_requested": 16,
+        "classic_present": 5,
+        "classic_missing": [
+          "1980214N11330",
+          "1988253N12306",
+          "2005236N23285",
+          "2017260N12310",
+          "2019236N10314",
+          "2015293N13266",
+          "2008117N11090",
+          "2019063S18038",
+          "2023036S12117",
+          "2011028S13180",
+          "2014004S17183"
+        ],
+        "point_count": 64,
+        "bad_storm_count": 1,
+        "bad_storm_ids": [
+          "1983227N15142"
+        ],
+        "all_feature_lengths_64": true,
+        "finite_shape_values": true,
+        "duplicate_storm_ids": 0,
+        "crs": "EPSG:4326"
+      },
+      "contract_exists": true
+    },
+    "handoff": {
+      "required_paths": {
+        "output/processed/taiwan/zones.geojson": true,
+        "output/processed/taiwan/facilities/shelters.geojson": true,
+        "output/processed/taiwan/facilities/medical/medical.geojson": true,
+        "output/processed/taiwan/facilities/shelter-coverage-2025.json": true,
+        "output/processed/features/global-since1980/features-64.json": true,
+        "output/processed/features/global-since1980/shape-normalized.npy": true,
+        "output/processed/features/wp-since1980/features-64.json": true,
+        "output/processed/era5/qa/era5-frame-manifest.json": true,
+        "output/processed/impact/exposure-2025-r2025a/taiwan-exposure-summary.parquet": true
+      },
+      "all_required_paths_present": true
+    },
+    "data_status": {
+      "formal_primary": "observed_ibtracs_plus_era5",
+      "synthetic_data_policy": "demo fixtures are excluded from primary handoff"
+    }
+  }
+}
