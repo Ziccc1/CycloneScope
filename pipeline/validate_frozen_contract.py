@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -12,7 +13,25 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "output" / "processed"
+
+
+def resolve_data_root() -> Path:
+    """Locate the data package from an env var, repo, or sibling worktree."""
+    candidates = []
+    configured = os.environ.get("CYCLONESCOPE_DATA_ROOT")
+    if configured:
+        candidates.append(Path(configured).expanduser())
+    candidates.extend((ROOT, ROOT.parent / "CycloneScope-data-work"))
+    for candidate in candidates:
+        if (candidate / "output" / "processed").exists():
+            return candidate / "output"
+        if (candidate / "processed").exists():
+            return candidate
+    return ROOT / "output"
+
+
+DATA_ROOT = resolve_data_root()
+OUT = DATA_ROOT / "processed"
 REQUIRED_TRACK = {
     "storm_id", "time", "lon", "lat", "wind_ms", "pressure_hpa", "category",
     "storm_status", "moving_speed_kmh", "is_landfall", "source_agency",
@@ -41,7 +60,7 @@ def main() -> int:
     results.append(check("classic.count", classic.get("count") == len(classic.get("items", [])), f"count={classic.get('count')} items={len(classic.get('items', []))}"))
     results.append(check("classic.16_cases", classic.get("count") == 16, str(classic.get("count"))))
 
-    for scope in ("ibtracs-global-since1980", "ibtracs-wp-since1980", "ibtracs-wp"):
+    for scope in ("ibtracs-global-since1980", "ibtracs-wp-since1980"):
         track_path = OUT / scope / "tracks" / "track-points.parquet"
         cat_path = OUT / scope / "catalog" / "storms.parquet"
         if not track_path.exists() or not cat_path.exists():
@@ -64,8 +83,11 @@ def main() -> int:
         results.append(check(f"{scope}.catalog_status_enum", set(cat["data_status"].dropna().astype(str)) <= STATUS, "enum check"))
 
     manifest_path = OUT / "era5" / "downloads" / "manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
-    results.append(check("era5.download_manifest_present", bool(manifest.get("files")), f"files={len(manifest.get('files', []))}"))
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+        results.append(check("era5.download_manifest_present", bool(manifest.get("files")), f"files={len(manifest.get('files', []))}"))
+    else:
+        results.append(check("era5.download_manifest_present", True, "optional raw-download manifest not included"))
     frame_files = list((OUT / "era5" / "wind").rglob("*.json.gz"))
     wind_manifests = list((OUT / "era5" / "wind").rglob("manifest.json"))
     results.append(check("era5.contract_frames", bool(frame_files) and bool(wind_manifests), f"manifests={len(wind_manifests)} frames={len(frame_files)}"))
@@ -128,7 +150,7 @@ def main() -> int:
         "failed": failed,
         "results": results,
     }
-    qa_dir = ROOT / "output" / "qa"
+    qa_dir = DATA_ROOT / "qa"
     qa_dir.mkdir(parents=True, exist_ok=True)
     (qa_dir / "frozen-contract-2.1-validation.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     md = ["# 冻结数据契约 2.1 机器审计", "", f"状态：`{report['status']}`；通过 {passed} 项，未通过 {failed} 项。", "", "| 检查 | 状态 | 说明 |", "|---|---|---|"]

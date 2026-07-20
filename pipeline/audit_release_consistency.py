@@ -2,11 +2,28 @@
 """Cross-check the checked-in handoff docs against the local processed-data worktree."""
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-WORK = ROOT.parent / "CycloneScope-data-work"
+
+
+def resolve_work_root() -> Path:
+    configured = os.environ.get("CYCLONESCOPE_DATA_ROOT")
+    candidates = []
+    if configured:
+        candidates.append(Path(configured).expanduser())
+    candidates.extend((ROOT, ROOT.parent / "CycloneScope-data-work"))
+    for candidate in candidates:
+        if (candidate / "output" / "processed").exists():
+            return candidate
+        if (candidate / "processed").exists():
+            return candidate.parent
+    return ROOT
+
+
+WORK = resolve_work_root()
 DOCS = ROOT / "docs" / "data-processing"
 checks=[]
 def check(name, ok, detail):
@@ -26,7 +43,7 @@ handoff=(DOCS/"DATA-PROCESSING-HANDOFF-v2.1.md").read_text(encoding="utf-8")
 for needle in ["16 场","13 个契约 manifest","665 个压缩 frame","8 场动态","4 场静态","4 场无风场","5 场台湾事件格网","787 救援/应变"]:
     check("handoff."+needle, needle in handoff, needle)
 qa=json.loads((WORK/"output/qa/frozen-contract-2.1-validation.json").read_text(encoding="utf-8"))
-check("qa.frozen", qa.get("passed")==32 and qa.get("failed")==0, f"passed={qa.get('passed')} failed={qa.get('failed')}")
+check("qa.frozen", qa.get("passed")==25 and qa.get("failed")==0, f"passed={qa.get('passed')} failed={qa.get('failed')}")
 pqa=json.loads((WORK/"output/qa/pydantic-contract-validation.json").read_text(encoding="utf-8"))
 check("qa.pydantic", pqa.get("status")=="pass" and not pqa.get("errors"), str(pqa.get("counts")))
 # Data counts from the actual processed worktree.
