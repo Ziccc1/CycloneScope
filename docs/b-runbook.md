@@ -47,23 +47,38 @@ $env:CYCLONESCOPE_DATA_MODE="fixture"
 A 交付正式产物并通过 Schema 后：
 
 ```powershell
+$env:CYCLONESCOPE_DATA_ROOT="C:\path\to\CycloneScope-data-delivery-v2.1"
 $env:CYCLONESCOPE_DATA_MODE="processed"
 .\scripts\start-backend.ps1
 ```
 
-`processed` 不会回退到气旋、风场、影响或台湾 fixture。缺文件时 API 返回明确 404。正式目录至少需要：
+`CYCLONESCOPE_DATA_ROOT` 可以指向包含 `output/processed` 的交付包、`output`
+目录，或 `processed` 目录本身。若未设置，B 会依次检查仓库
+`output/processed/`、相邻 `CycloneScope-data-work/output/processed/` 和
+`backend/data/processed/`。
+
+`processed` 不会回退到气旋、轨迹、风场、影响或台湾 fixture。缺文件时
+API 返回明确 404。B 直接适配 A v2.1 的实际目录：
 
 ```text
-backend/data/processed/
+output/processed/
 ├─ catalog/storms-summary.json
-├─ catalog/details/{storm_id}.json
-├─ wind/global/{period_id}/manifest.json
-├─ wind/storms/{storm_id}/manifest.json
-├─ wind/storms/{storm_id}/frames/*.json.gz
+├─ ibtracs-global-since1980/tracks/track-points.parquet
+├─ era5/wind/global/{period_id}/manifest.json
+├─ era5/wind/storms/{storm_id}/manifest.json
+├─ era5/wind/storms/{storm_id}/frames/*.json.gz
 ├─ impact/storms/{storm_id}/grid.geojson
 ├─ impact/windows/{window_id}/grid.geojson
-└─ taiwan/zones.geojson + facilities.geojson
+├─ taiwan/zones.geojson + facilities.geojson
+└─ taiwan/roads/facility-service-area.parquet
 ```
+
+manifest 内 A 侧相对 frame 路径会由 B 重写为 `/api/.../frames/...`，前端
+不需要知道交付包在磁盘上的位置。
+
+B 会将 `classic/classic-storms.json` 的 16 场清单合并到全量目录，并以磁盘
+上实际存在的 ERA5 manifest 和影响 grid 计算 `wind_available` /
+`impact_available`。这样可避免 A 的全量目录中旧能力标记与最终交付文件不一致。
 
 ## 5. API 烟测
 

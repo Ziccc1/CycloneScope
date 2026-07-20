@@ -122,6 +122,11 @@ POST /api/scenarios/{scenario_id}/evaluate
 
 默认 `CYCLONESCOPE_DATA_MODE=fixture`，页面会持续显示夹具警告。正式数据由 A 放入 `backend/data/processed/` 后显式切换到 `processed`；MapLibre、真实粒子、手绘匹配算法和设施空间算法由 C 通过现有插槽与 service 接口接入。
 
+正式数据也可以保留在 A 的交付包中，并通过
+`CYCLONESCOPE_DATA_ROOT` 指向包含 `output/processed` 的目录。B 会直接适配
+A v2.1 的 Parquet 轨迹、ERA5 manifest/frame、影响 GeoJSON、台湾图层与
+道路服务区，不要求复制或改名为另一套目录。
+
 
 ## 数据处理交付
 

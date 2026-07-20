@@ -20,13 +20,14 @@ DEFAULT_DATABASE_URL = f"sqlite:///{DEFAULT_DB_PATH.as_posix()}"
 def create_app(
     database_url: str | None = None,
     data_mode: str | None = None,
+    processed_root: str | Path | None = None,
 ) -> FastAPI:
     resolved_database_url = database_url or os.getenv(
         "CYCLONESCOPE_DATABASE_URL", DEFAULT_DATABASE_URL
     )
     resolved_data_mode = data_mode or os.getenv("CYCLONESCOPE_DATA_MODE", "fixture")
     engine, session_factory = create_database(resolved_database_url)
-    repository = create_repository(resolved_data_mode)
+    repository = create_repository(resolved_data_mode, processed_root)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

@@ -1,12 +1,23 @@
 import type {
   EvaluationRequest,
   EvaluationResponse,
+  FacilityCollection,
   FacilityCreate,
   FacilityRead,
+  FacilityServiceAreaResponse,
   FacilityUpdate,
+  ImpactGridCollection,
   ScenarioDetail,
   ScenarioRead,
   ScenarioUpdate,
+  StormCatalogResponse,
+  StormDetail,
+  StormTrackResponse,
+  TaiwanZoneCollection,
+  TrajectoryMatchRequest,
+  TrajectoryMatchResponse,
+  WindFrame,
+  WindManifest,
 } from './types/contracts'
 
 export class ApiError extends Error {
@@ -114,6 +125,72 @@ export const scenarioApi = {
   },
   evaluate(id: string, payload: EvaluationRequest) {
     return requestJson<EvaluationResponse>(`/api/scenarios/${id}/evaluate`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+}
+
+export const dataApi = {
+  storms(
+    filters: Record<string, string | number | boolean | null | undefined> = {},
+    signal?: AbortSignal,
+  ) {
+    return getJson<StormCatalogResponse>(
+      buildQuery('/api/storms', filters),
+      signal,
+    )
+  },
+  storm(id: string, signal?: AbortSignal) {
+    return getJson<StormDetail>(`/api/storms/${id}`, signal)
+  },
+  track(id: string, signal?: AbortSignal) {
+    return getJson<StormTrackResponse>(`/api/storms/${id}/track`, signal)
+  },
+  stormWind(id: string, signal?: AbortSignal) {
+    return getJson<WindManifest>(`/api/storms/${id}/wind/manifest`, signal)
+  },
+  periodWind(id: string, signal?: AbortSignal) {
+    return getJson<WindManifest>(`/api/wind/periods/${id}/manifest`, signal)
+  },
+  windFrame(url: string, signal?: AbortSignal) {
+    return getJson<WindFrame>(url, signal)
+  },
+  impact(
+    filters: Record<string, string | number | null | undefined>,
+    signal?: AbortSignal,
+  ) {
+    return getJson<ImpactGridCollection>(
+      buildQuery('/api/impact/grid', filters),
+      signal,
+    )
+  },
+  taiwanZones(
+    filters: Record<string, string | null | undefined> = {},
+    signal?: AbortSignal,
+  ) {
+    return getJson<TaiwanZoneCollection>(
+      buildQuery('/api/taiwan/zones', filters),
+      signal,
+    )
+  },
+  taiwanFacilities(
+    filters: Record<string, string | null | undefined> = {},
+    signal?: AbortSignal,
+  ) {
+    return getJson<FacilityCollection>(
+      buildQuery('/api/taiwan/facilities', filters),
+      signal,
+    )
+  },
+  facilityServiceArea(id: string, signal?: AbortSignal) {
+    return getJson<FacilityServiceAreaResponse>(
+      `/api/taiwan/facilities/${id}/service-area`,
+      signal,
+    )
+  },
+  trajectory(payload: TrajectoryMatchRequest) {
+    return requestJson<TrajectoryMatchResponse>('/api/trajectory-match', {
       method: 'POST',
       body: JSON.stringify(payload),
     })

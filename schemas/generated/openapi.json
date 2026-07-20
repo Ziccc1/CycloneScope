@@ -45,7 +45,7 @@
           "id": {
             "maxLength": 80,
             "minLength": 1,
-            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "pattern": "^[a-z0-9][a-z0-9_-]*$",
             "title": "Id",
             "type": "string"
           },
@@ -605,6 +605,58 @@
           "is_simulated"
         ],
         "title": "FacilityRead",
+        "type": "object"
+      },
+      "FacilityServiceAreaResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "minimum": 0.0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/DataStatus"
+          },
+          "facility_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Facility Id",
+            "type": "string"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceAreaRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data_status",
+          "facility_id",
+          "items",
+          "count"
+        ],
+        "title": "FacilityServiceAreaResponse",
         "type": "object"
       },
       "FacilityType": {
@@ -1343,6 +1395,81 @@
           "name"
         ],
         "title": "ScenarioUpdate",
+        "type": "object"
+      },
+      "ServiceAreaRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "coverage_method": {
+            "const": "network_travel_time",
+            "title": "Coverage Method",
+            "type": "string"
+          },
+          "facility_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Facility Id",
+            "type": "string"
+          },
+          "facility_type": {
+            "$ref": "#/components/schemas/FacilityType"
+          },
+          "population_reference": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Population Reference",
+            "type": "string"
+          },
+          "reachable_population": {
+            "minimum": 0.0,
+            "title": "Reachable Population",
+            "type": "integer"
+          },
+          "service_threshold_min": {
+            "exclusiveMinimum": 0.0,
+            "title": "Service Threshold Min",
+            "type": "integer"
+          },
+          "speed_source": {
+            "default": "mixed_osm_and_default_by_road_class",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Speed Source",
+            "type": "string"
+          },
+          "travel_time_min": {
+            "minimum": 0.0,
+            "title": "Travel Time Min",
+            "type": "number"
+          },
+          "travel_time_quality": {
+            "default": "low",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Travel Time Quality",
+            "type": "string"
+          },
+          "zone_id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Zone Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "facility_id",
+          "facility_type",
+          "zone_id",
+          "travel_time_min",
+          "reachable_population",
+          "service_threshold_min",
+          "coverage_method",
+          "population_reference"
+        ],
+        "title": "ServiceAreaRecord",
         "type": "object"
       },
       "StormCatalogResponse": {
@@ -3981,6 +4108,48 @@
         ]
       }
     },
+    "/api/taiwan/facilities/{facility_id}/service-area": {
+      "get": {
+        "operationId": "facility_service_area_api_taiwan_facilities__facility_id__service_area_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "facility_id",
+            "required": true,
+            "schema": {
+              "title": "Facility Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityServiceAreaResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Facility Service Area",
+        "tags": [
+          "taiwan"
+        ]
+      }
+    },
     "/api/taiwan/zones": {
       "get": {
         "operationId": "taiwan_zones_api_taiwan_zones_get",
@@ -4084,6 +4253,57 @@
         "summary": "Trajectory Match",
         "tags": [
           "analysis"
+        ]
+      }
+    },
+    "/api/wind/periods/{period_id}/frames/{frame_name}": {
+      "get": {
+        "operationId": "period_wind_frame_api_wind_periods__period_id__frames__frame_name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "title": "Period Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "frame_name",
+            "required": true,
+            "schema": {
+              "title": "Frame Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindFrame"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Period Wind Frame",
+        "tags": [
+          "wind"
         ]
       }
     },

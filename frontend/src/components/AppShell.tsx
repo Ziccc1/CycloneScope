@@ -293,7 +293,7 @@ export default function AppShell({
                     <div><span>持续时间</span><strong>{selected.duration_hours}</strong><small>小时</small></div>
                     <div><span>登陆次数</span><strong>{selected.landfall_count}</strong><small>次</small></div>
                     <div><span>ACE</span><strong>{valueOrDash(selected.ace)}</strong><small>指数</small></div>
-                    <div><span>影响分</span><strong>{valueOrDash(selected.impact_score)}</strong><small>fixture</small></div>
+                    <div><span>影响分</span><strong>{valueOrDash(selected.impact_score)}</strong><small>排序指标</small></div>
                   </div>
                 )}
               </section>
