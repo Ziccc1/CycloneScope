@@ -281,6 +281,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/taiwan/facilities/{facility_id}/service-area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Facility Service Area */
+        get: operations["facility_service_area_api_taiwan_facilities__facility_id__service_area_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/taiwan/zones": {
         parameters: {
             query?: never;
@@ -309,6 +326,23 @@ export interface paths {
         put?: never;
         /** Trajectory Match */
         post: operations["trajectory_match_api_trajectory_match_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wind/periods/{period_id}/frames/{frame_name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Period Wind Frame */
+        get: operations["period_wind_frame_api_wind_periods__period_id__frames__frame_name__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -565,6 +599,29 @@ export interface components {
              */
             service_radius_km: number | null;
             type: components["schemas"]["FacilityType"];
+        };
+        /** FacilityServiceAreaResponse */
+        FacilityServiceAreaResponse: {
+            /** Count */
+            count: number;
+            data_status: components["schemas"]["DataStatus"];
+            /** Facility Id */
+            facility_id: string;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at?: string;
+            /** Items */
+            items: components["schemas"]["ServiceAreaRecord"][];
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /** Source Ids */
+            source_ids?: string[];
         };
         /**
          * FacilityType
@@ -854,6 +911,38 @@ export interface components {
         ScenarioUpdate: {
             /** Name */
             name: string;
+        };
+        /** ServiceAreaRecord */
+        ServiceAreaRecord: {
+            /**
+             * Coverage Method
+             * @constant
+             */
+            coverage_method: "network_travel_time";
+            /** Facility Id */
+            facility_id: string;
+            facility_type: components["schemas"]["FacilityType"];
+            /** Population Reference */
+            population_reference: string;
+            /** Reachable Population */
+            reachable_population: number;
+            /** Service Threshold Min */
+            service_threshold_min: number;
+            /**
+             * Speed Source
+             * @default mixed_osm_and_default_by_road_class
+             */
+            speed_source: string;
+            /** Travel Time Min */
+            travel_time_min: number;
+            /**
+             * Travel Time Quality
+             * @default low
+             * @enum {string}
+             */
+            travel_time_quality: "low" | "medium" | "high";
+            /** Zone Id */
+            zone_id: string;
         };
         /** StormCatalogResponse */
         StormCatalogResponse: {
@@ -2148,6 +2237,37 @@ export interface operations {
             };
         };
     };
+    facility_service_area_api_taiwan_facilities__facility_id__service_area_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                facility_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacilityServiceAreaResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     taiwan_zones_api_taiwan_zones_get: {
         parameters: {
             query?: {
@@ -2200,6 +2320,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrajectoryMatchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    period_wind_frame_api_wind_periods__period_id__frames__frame_name__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period_id: string;
+                frame_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WindFrame"];
                 };
             };
             /** @description Validation Error */

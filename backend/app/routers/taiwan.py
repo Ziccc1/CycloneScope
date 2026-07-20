@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..dependencies import get_repository
 from ..query import geometry_intersects_bounds, parse_bbox, point_in_bounds
-from ..repository import DataRepository
-from ..schemas import FacilityCollection, FacilityType, TaiwanZoneCollection
+from ..repository import DataAssetNotFound, DataRepository
+from ..schemas import (
+    FacilityCollection,
+    FacilityServiceAreaResponse,
+    FacilityType,
+    TaiwanZoneCollection,
+)
 
 
 router = APIRouter()
@@ -17,7 +22,10 @@ def taiwan_zones(
     bbox: str | None = None,
     repository: DataRepository = Depends(get_repository),
 ):
-    payload = repository.get_taiwan_zones()
+    try:
+        payload = repository.get_taiwan_zones()
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
     bounds = parse_bbox(bbox)
     features = [
         feature
@@ -42,7 +50,10 @@ def taiwan_facilities(
     bbox: str | None = None,
     repository: DataRepository = Depends(get_repository),
 ):
-    payload = repository.get_taiwan_facilities()
+    try:
+        payload = repository.get_taiwan_facilities()
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
     bounds = parse_bbox(bbox)
     features = [
         feature
@@ -59,3 +70,18 @@ def taiwan_facilities(
         )
     ]
     return {**payload, "features": features}
+
+
+@router.get(
+    "/api/taiwan/facilities/{facility_id}/service-area",
+    response_model=FacilityServiceAreaResponse,
+    tags=["taiwan"],
+)
+def facility_service_area(
+    facility_id: str,
+    repository: DataRepository = Depends(get_repository),
+):
+    try:
+        return repository.get_facility_service_area(facility_id)
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error

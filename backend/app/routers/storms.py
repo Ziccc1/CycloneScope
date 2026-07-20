@@ -21,7 +21,17 @@ router = APIRouter()
 
 
 def _storm_or_404(repository: DataRepository, storm_id: str) -> dict:
-    storm = repository.get_storm(storm_id)
+    try:
+        storm = repository.get_storm(storm_id)
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    if not storm:
+        raise HTTPException(status_code=404, detail="Storm not found")
+    return storm
+
+
+def _summary_or_404(repository: DataRepository, storm_id: str) -> dict:
+    storm = repository.get_storm_summary(storm_id)
     if not storm:
         raise HTTPException(status_code=404, detail="Storm not found")
     return storm
@@ -105,10 +115,14 @@ def storm_track(
         raise HTTPException(status_code=422, detail="start must not exceed end")
     if (start and start.tzinfo is None) or (end and end.tzinfo is None):
         raise HTTPException(status_code=422, detail="track time filters must include UTC offset")
-    storm = _storm_or_404(repository, storm_id)
+    storm = _summary_or_404(repository, storm_id)
+    try:
+        track = repository.get_track(storm_id)
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
     points = [
         point
-        for point in storm["track"]
+        for point in track["points"]
         if (start is None or datetime.fromisoformat(point["time"].replace("Z", "+00:00")) >= start)
         and (end is None or datetime.fromisoformat(point["time"].replace("Z", "+00:00")) <= end)
     ]
@@ -130,10 +144,19 @@ def storm_track(
 def storm_impact(
     storm_id: str, repository: DataRepository = Depends(get_repository)
 ):
-    storm = _storm_or_404(repository, storm_id)
+    storm = _summary_or_404(repository, storm_id)
     return {
         "storm_id": storm_id,
-        **storm["impact"],
+        "estimated_exposed_population": None,
+        "wind_footprint_area_km2": None,
+        "reported_deaths": storm.get("reported_deaths"),
+        "reported_affected_population": None,
+        "reported_damage_usd_2024": storm.get("reported_damage_usd_2024"),
+        "warning": (
+            "Event impact grid is available through /api/impact/grid."
+            if storm.get("impact_available")
+            else "No event impact grid is available for this storm."
+        ),
         "data_status": storm["data_status"],
         "source_ids": storm["source_ids"],
     }
@@ -193,5 +216,21 @@ def period_wind_manifest(
 ):
     try:
         return repository.get_period_wind_manifest(period_id)
+    except DataAssetNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+
+
+@router.get(
+    "/api/wind/periods/{period_id}/frames/{frame_name}",
+    response_model=WindFrame,
+    tags=["wind"],
+)
+def period_wind_frame(
+    period_id: str,
+    frame_name: str,
+    repository: DataRepository = Depends(get_repository),
+):
+    try:
+        return repository.get_period_wind_frame(period_id, frame_name)
     except DataAssetNotFound as error:
         raise HTTPException(status_code=404, detail=str(error)) from error

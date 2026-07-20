@@ -96,3 +96,32 @@ class FacilityFeature(ContractModel):
 class FacilityCollection(ContractMetadata):
     type: Literal["FeatureCollection"] = "FeatureCollection"
     features: list[FacilityFeature]
+
+
+class ServiceAreaRecord(ContractModel):
+    facility_id: str = Field(min_length=1, max_length=120)
+    facility_type: FacilityType
+    zone_id: str = Field(min_length=1, max_length=120)
+    travel_time_min: float = Field(ge=0)
+    reachable_population: int = Field(ge=0)
+    service_threshold_min: int = Field(gt=0)
+    coverage_method: Literal["network_travel_time"]
+    population_reference: str = Field(min_length=1, max_length=160)
+    speed_source: str = Field(
+        default="mixed_osm_and_default_by_road_class", min_length=1, max_length=160
+    )
+    travel_time_quality: Literal["low", "medium", "high"] = "low"
+
+
+class FacilityServiceAreaResponse(ContractMetadata):
+    facility_id: str = Field(min_length=1, max_length=120)
+    items: list[ServiceAreaRecord]
+    count: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def count_matches_items(self) -> "FacilityServiceAreaResponse":
+        if self.count != len(self.items):
+            raise ValueError("count must equal the number of service-area rows")
+        if any(item.facility_id != self.facility_id for item in self.items):
+            raise ValueError("service-area rows must belong to facility_id")
+        return self
