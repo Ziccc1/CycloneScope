@@ -6,7 +6,7 @@
 
 ## 结论
 
-当前契约校验结果为：**32 项机器检查通过，0 项失败**。Pydantic 严格校验通过：严格风暴目录、台湾区、台湾设施、13 个 WindManifest、665 个 WindFrame 和 5 个 ImpactGrid 全部通过。
+当前契约校验结果为：**25 项机器检查通过，0 项失败**。Pydantic 严格校验通过：严格风暴目录、台湾区、台湾设施、13 个 WindManifest、665 个 WindFrame 和 5 个 ImpactGrid 全部通过。
 
 状态为 `pass_with_known_coverage_limits`，不是所有功能数据都完整覆盖。以下是已知范围限制，不属于字段清洗错误：
 

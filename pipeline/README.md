@@ -27,3 +27,15 @@ python pipeline/validate_frozen_contract.py
 ```
 
 原始文件放在 `input/raw/`，大型数据不提交 GitHub。前端不直接读取 Parquet、NetCDF、GeoTIFF 或 PBF；B 必须根据 API-INDEX 和冻结契约生成 API。
+
+## Validation with an external delivery package
+
+The validators resolve data in this order: `CYCLONESCOPE_DATA_ROOT`, the repository `output/` directory, then the sibling `CycloneScope-data-work/` directory. For the delivery archive, extract its `output/` folder and run:
+
+```powershell
+$env:CYCLONESCOPE_DATA_ROOT = 'C:\path\to\CycloneScope-data-delivery-v2.1'
+python pipeline/validate_frozen_contract.py
+python pipeline/audit_release_consistency.py
+```
+
+The current contract validates `ibtracs-wp-since1980/`; the deprecated `ibtracs-wp/` alias is not required. Raw ERA5 NetCDF files are not required; `era5/downloads/manifest.json` is optional metadata.
