@@ -2741,6 +2741,14 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "WindCapability": {
+        "enum": [
+          "dynamic",
+          "static"
+        ],
+        "title": "WindCapability",
+        "type": "string"
+      },
       "WindFrame": {
         "additionalProperties": false,
         "properties": {
@@ -2878,6 +2886,17 @@
         "properties": {
           "bounds": {
             "$ref": "#/components/schemas/GeoBounds"
+          },
+          "capability": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WindCapability"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "data_status": {
             "$ref": "#/components/schemas/DataStatus"

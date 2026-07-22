@@ -1478,6 +1478,11 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * WindCapability
+         * @enum {string}
+         */
+        WindCapability: "dynamic" | "static";
         /** WindFrame */
         WindFrame: {
             /** Dataset Id */
@@ -1530,6 +1535,8 @@ export interface components {
         /** WindManifest */
         WindManifest: {
             bounds: components["schemas"]["GeoBounds"];
+            /** @default null */
+            capability: components["schemas"]["WindCapability"] | null;
             data_status: components["schemas"]["DataStatus"];
             /** Dataset Id */
             dataset_id: string;

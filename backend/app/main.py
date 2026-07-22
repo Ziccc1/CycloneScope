@@ -10,7 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, create_database
 from .repository import create_repository
 from .routers import impact, scenarios, storms, system, taiwan, trajectory
-from .services import FixtureFacilityEvaluator, FixtureTrajectoryMatcher
+from .services import (
+    FixtureFacilityEvaluator,
+    FixtureTrajectoryMatcher,
+    ProcessedTrajectoryMatcher,
+)
 
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[1] / "data" / "cyclonescope.db"
@@ -44,7 +48,13 @@ def create_app(
     app.state.session_factory = session_factory
     app.state.repository = repository
     app.state.facility_evaluator = FixtureFacilityEvaluator()
-    app.state.trajectory_matcher = FixtureTrajectoryMatcher()
+    app.state.trajectory_matcher = (
+        ProcessedTrajectoryMatcher(
+            repository.root / "features" / "global-since1980" / "features-64.json"
+        )
+        if resolved_data_mode == "processed"
+        else FixtureTrajectoryMatcher()
+    )
 
     origins = os.getenv(
         "CYCLONESCOPE_CORS_ORIGINS",

@@ -52,7 +52,13 @@ def storms(
 ):
     if season_from is not None and season_to is not None and season_from > season_to:
         raise HTTPException(status_code=422, detail="season_from must not exceed season_to")
-    items = list(repository.list_storms())
+    try:
+        items = list(repository.list_storms())
+    except DataAssetNotFound as error:
+        # A missing/incomplete processed package is a data availability issue,
+        # not an internal server failure. Keep the response actionable for the
+        # caller instead of leaking a 500 from the repository layer.
+        raise HTTPException(status_code=404, detail=str(error)) from error
     if basin:
         items = [item for item in items if item["basin"].lower() == basin.lower()]
     if classic is not None:

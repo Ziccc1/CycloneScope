@@ -144,8 +144,15 @@ export const dataApi = {
   storm(id: string, signal?: AbortSignal) {
     return getJson<StormDetail>(`/api/storms/${id}`, signal)
   },
-  track(id: string, signal?: AbortSignal) {
-    return getJson<StormTrackResponse>(`/api/storms/${id}/track`, signal)
+  track(
+    id: string,
+    filters: { start?: string; end?: string } = {},
+    signal?: AbortSignal,
+  ) {
+    return getJson<StormTrackResponse>(
+      buildQuery(`/api/storms/${id}/track`, filters),
+      signal,
+    )
   },
   stormWind(id: string, signal?: AbortSignal) {
     return getJson<WindManifest>(`/api/storms/${id}/wind/manifest`, signal)
@@ -189,10 +196,11 @@ export const dataApi = {
       signal,
     )
   },
-  trajectory(payload: TrajectoryMatchRequest) {
+  trajectory(payload: TrajectoryMatchRequest, signal?: AbortSignal) {
     return requestJson<TrajectoryMatchResponse>('/api/trajectory-match', {
       method: 'POST',
       body: JSON.stringify(payload),
+      signal,
     })
   },
 }

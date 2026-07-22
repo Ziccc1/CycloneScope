@@ -137,6 +137,7 @@ class FixtureRepository:
             "dataset_id": f"{storm_id}-demo-wind",
             "mode": "storm",
             "storm_id": storm_id,
+            "capability": "dynamic",
             "data_status": "synthetic_fixture",
             "source_ids": [],
             "bounds": {"west": 120, "south": 20, "east": 124, "north": 24},
@@ -169,6 +170,7 @@ class FixtureRepository:
             {
                 "dataset_id": "demo-global",
                 "mode": "global",
+                "capability": "dynamic",
                 "data_status": "synthetic_fixture",
                 "source_ids": [],
                 "bounds": {"west": 120, "south": 20, "east": 124, "north": 24},
@@ -382,6 +384,20 @@ class ProcessedRepository:
 
     def get_wind_manifest(self, storm_id: str) -> dict[str, Any]:
         payload = dict(_cached(self._storm_wind_root(storm_id) / "manifest.json"))
+        matrix = _cached(self.root / "era5" / "qa" / "era5-capability-matrix.json")
+        capability = next(
+            (
+                item
+                for item in matrix.get("items", [])
+                if str(item.get("storm_id")) == storm_id
+            ),
+            None,
+        )
+        if not capability or not capability.get("era5_available"):
+            raise DataAssetNotFound(f"Wind capability not found for storm: {storm_id}")
+        payload["capability"] = (
+            "dynamic" if capability.get("has_dynamic") else "static"
+        )
         payload["frames"] = [
             {
                 **frame,
@@ -400,6 +416,7 @@ class ProcessedRepository:
 
     def get_period_wind_manifest(self, period_id: str) -> dict[str, Any]:
         payload = dict(_cached(self._period_wind_root(period_id) / "manifest.json"))
+        payload["capability"] = "dynamic"
         payload["frames"] = [
             {
                 **frame,

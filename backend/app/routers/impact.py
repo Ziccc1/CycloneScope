@@ -44,7 +44,10 @@ def impact_grid(
         if geometry_intersects_bounds(feature["geometry"]["coordinates"], bounds)
         and (
             hazard_threshold is None
-            or (feature["properties"].get("hazard_index") or 0) >= hazard_threshold
+            or (
+                feature["properties"].get("hazard_index") is not None
+                and feature["properties"]["hazard_index"] >= hazard_threshold
+            )
         )
     ]
     return {**payload, "metric": selected_metric, "features": features}

@@ -15,6 +15,11 @@ class WindMode(str, Enum):
     STORM = "storm"
 
 
+class WindCapability(str, Enum):
+    DYNAMIC = "dynamic"
+    STATIC = "static"
+
+
 class WindFrameReference(ContractModel):
     time: datetime
     url: str = Field(min_length=1, max_length=500)
@@ -26,6 +31,7 @@ class WindManifest(ContractMetadata):
     dataset_id: str = Field(min_length=1, max_length=120)
     mode: WindMode
     storm_id: str | None = Field(default=None, max_length=40)
+    capability: WindCapability | None = None
     units: Literal["m/s"] = "m/s"
     grid_order: Literal[
         "north_to_south_west_to_east_row_major"

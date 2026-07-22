@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 import { useAppDispatch, useAppState, type AnalysisMode } from '../state/AppState'
 import type {
   DataSourceListResponse,
@@ -37,7 +38,7 @@ const modes: { value: AnalysisMode; label: string }[] = [
 const layerLabels = {
   tracks: '历史轨迹',
   wind: '风场粒子',
-  impact: '影响格网',
+  impact: '区域影响',
   facilities: '防灾设施',
 }
 
@@ -65,6 +66,34 @@ export default function AppShell({
       .map((id) => storms.find((storm) => storm.id === id) ?? null)
       .filter((storm): storm is StormSummary => Boolean(storm)),
   ].filter((storm): storm is StormSummary => Boolean(storm))
+  const activeStart = state.timeWindow?.start ?? selected?.start_time ?? null
+  const activeEnd = state.timeWindow?.end ?? selected?.end_time ?? null
+  const activeTime = state.currentTime ?? activeStart
+  const timelineProgress = activeStart && activeEnd && activeTime
+    ? Math.max(0, Math.min(100, ((Date.parse(activeTime) - Date.parse(activeStart)) / Math.max(1, Date.parse(activeEnd) - Date.parse(activeStart))) * 100))
+    : 0
+
+  useEffect(() => {
+    if (!state.isPlaying || !activeStart || !activeEnd) return
+    const start = Date.parse(activeStart)
+    const end = Date.parse(activeEnd)
+    const initial = Date.parse(activeTime ?? activeStart)
+    const wallStart = performance.now()
+    const timer = window.setInterval(() => {
+      const elapsed = (performance.now() - wallStart) * 60_000 * state.playbackSpeed
+      const next = Math.min(end, initial + elapsed)
+      dispatch({ type: 'set-time', value: new Date(next).toISOString() })
+      if (next >= end) dispatch({ type: 'set-playing', value: false })
+    }, 100)
+    return () => window.clearInterval(timer)
+  }, [dispatch, state.isPlaying, state.playbackSpeed, activeStart, activeEnd])
+
+  function setTimeline(value: number) {
+    if (!activeStart || !activeEnd) return
+    const start = Date.parse(activeStart)
+    const end = Date.parse(activeEnd)
+    dispatch({ type: 'set-time', value: new Date(start + (end - start) * value / 100).toISOString() })
+  }
 
   function renderFeatureSlot() {
     if (state.mode === 'draw-match' && slots.trajectory) return slots.trajectory
@@ -246,7 +275,12 @@ export default function AppShell({
                 <button
                   className="case-select"
                   type="button"
-                  onClick={() => dispatch({ type: 'select-storm', stormId: storm.id })}
+                  onClick={() => {
+                    if (storm.impact_available) {
+                      dispatch({ type: 'set-layer', layer: 'impact', value: { visible: true } })
+                    }
+                    dispatch({ type: 'select-storm', stormId: storm.id })
+                  }}
                 >
                   <span>{storm.basin} · {storm.season}</span>
                   <strong>{storm.name}</strong>
@@ -287,14 +321,19 @@ export default function AppShell({
                 {!selected ? (
                   <p className="empty">从左侧选择一场气旋查看指标。</p>
                 ) : (
-                  <div className="metric-grid">
-                    <div><span>最大风速</span><strong>{valueOrDash(selected.max_wind_ms)}</strong><small>m/s</small></div>
-                    <div><span>最低气压</span><strong>{valueOrDash(selected.min_pressure_hpa)}</strong><small>hPa</small></div>
-                    <div><span>持续时间</span><strong>{selected.duration_hours}</strong><small>小时</small></div>
-                    <div><span>登陆次数</span><strong>{selected.landfall_count}</strong><small>次</small></div>
-                    <div><span>ACE</span><strong>{valueOrDash(selected.ace)}</strong><small>指数</small></div>
-                    <div><span>影响分</span><strong>{valueOrDash(selected.impact_score)}</strong><small>排序指标</small></div>
-                  </div>
+                  <>
+                    <div className="metric-grid">
+                      <div><span>当前风速</span><strong>{valueOrDash(state.currentObservation?.wind_ms)}</strong><small>m/s</small></div>
+                      <div><span>当前气压</span><strong>{valueOrDash(state.currentObservation?.pressure_hpa)}</strong><small>hPa</small></div>
+                      <div><span>类别</span><strong className="metric-text">{state.currentObservation?.category ?? '—'}</strong><small>真实观测</small></div>
+                      <div><span>移动速度</span><strong>{valueOrDash(state.currentObservation?.moving_speed_kmh)}</strong><small>km/h</small></div>
+                      <div><span>观测机构</span><strong className="metric-text">{state.currentObservation?.source_agency ?? '—'}</strong><small>来源</small></div>
+                      <div><span>观测时间</span><strong className="metric-time">{state.currentObservation?.time.slice(0, 16).replace('T', ' ') ?? '—'}</strong><small>UTC</small></div>
+                    </div>
+                    <p className="event-summary">
+                      全程最大风速 {valueOrDash(selected.max_wind_ms, ' m/s')} · 最低气压 {valueOrDash(selected.min_pressure_hpa, ' hPa')} · ACE {valueOrDash(selected.ace)}
+                    </p>
+                  </>
                 )}
               </section>
 
@@ -351,7 +390,8 @@ export default function AppShell({
             type="range"
             min="0"
             max="100"
-            defaultValue="50"
+            value={timelineProgress}
+            onChange={(event) => setTimeline(Number(event.target.value))}
             disabled={!selected}
           />
           <span>{state.timeWindow?.end.slice(0, 10) ?? selected?.end_time.slice(0, 10) ?? '结束'}</span>

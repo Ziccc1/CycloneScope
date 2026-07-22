@@ -180,6 +180,23 @@ def test_processed_repository_adapts_a_v21_catalog_track_and_manifest(
     monkeypatch.setattr("app.repository.read_parquet_rows", fake_parquet)
     wind_root = tmp_path / "era5" / "wind" / "storms" / "storm-1"
     wind_root.mkdir(parents=True)
+    capability_root = tmp_path / "era5" / "qa"
+    capability_root.mkdir(parents=True)
+    (capability_root / "era5-capability-matrix.json").write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "storm_id": "storm-1",
+                        "era5_available": True,
+                        "has_dynamic": True,
+                        "has_static": False,
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     manifest = {
         "schema_version": "1.0",
         "data_status": "reanalysis",
@@ -218,6 +235,7 @@ def test_processed_repository_adapts_a_v21_catalog_track_and_manifest(
         repository.get_wind_manifest("storm-1")["frames"][0]["url"]
         == "/api/storms/storm-1/wind/frames/frame-0.json.gz"
     )
+    assert repository.get_wind_manifest("storm-1")["capability"] == "dynamic"
 
 
 def test_processed_repository_maps_a_source_manifest(tmp_path):

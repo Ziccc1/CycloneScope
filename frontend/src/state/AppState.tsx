@@ -18,12 +18,33 @@ export interface LayerState {
   opacity: number
 }
 
+export type ImpactMetric =
+  | 'hazard_index'
+  | 'max_wind_ms'
+  | 'precip_mm'
+  | 'population'
+  | 'exposed_population'
+  | 'reported_damage_usd'
+
+export interface CurrentObservation {
+  time: string
+  lon: number
+  lat: number
+  wind_ms: number | null
+  pressure_hpa: number | null
+  category: string | null
+  moving_speed_kmh: number | null
+  source_agency: string | null
+}
+
 export interface AppState {
   mode: AnalysisMode
   selectedStormId: string | null
   comparisonStormIds: string[]
   currentTime: string | null
+  currentObservation: CurrentObservation | null
   timeWindow: { start: string; end: string } | null
+  impactMetric: ImpactMetric
   filters: {
     basins: string[]
     seasonRange: [number, number]
@@ -44,7 +65,9 @@ type Action =
   | { type: 'set-min-wind'; value: number }
   | { type: 'set-layer'; layer: keyof AppState['layers']; value: Partial<LayerState> }
   | { type: 'set-time'; value: string | null }
+  | { type: 'set-current-observation'; value: CurrentObservation | null }
   | { type: 'set-time-window'; value: AppState['timeWindow'] }
+  | { type: 'set-impact-metric'; value: ImpactMetric }
   | { type: 'set-scenario'; scenarioId: string | null }
   | { type: 'set-playing'; value: boolean }
   | { type: 'set-speed'; value: number }
@@ -55,7 +78,9 @@ export const initialState: AppState = {
   selectedStormId: null,
   comparisonStormIds: [],
   currentTime: null,
+  currentObservation: null,
   timeWindow: null,
+  impactMetric: 'hazard_index',
   filters: {
     basins: [],
     seasonRange: [1840, 2200],
@@ -64,7 +89,7 @@ export const initialState: AppState = {
   layers: {
     tracks: { visible: true, opacity: 0.75 },
     wind: { visible: true, opacity: 0.45 },
-    impact: { visible: false, opacity: 0.68 },
+    impact: { visible: true, opacity: 0.62 },
     facilities: { visible: true, opacity: 0.9 },
   },
   selectedScenarioId: null,
@@ -75,9 +100,27 @@ export const initialState: AppState = {
 export function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'set-mode':
-      return { ...state, mode: action.mode }
+      return action.mode === 'overview'
+        ? {
+            ...state,
+            mode: action.mode,
+            selectedStormId: null,
+            currentTime: null,
+            currentObservation: null,
+            timeWindow: null,
+            isPlaying: false,
+          }
+        : { ...state, mode: action.mode }
     case 'select-storm':
-      return { ...state, selectedStormId: action.stormId, mode: action.stormId ? 'storm' : state.mode }
+      return {
+        ...state,
+        selectedStormId: action.stormId,
+        mode: action.stormId ? 'storm' : state.mode,
+        currentTime: null,
+        currentObservation: null,
+        timeWindow: null,
+        isPlaying: false,
+      }
     case 'toggle-comparison': {
       const exists = state.comparisonStormIds.includes(action.stormId)
       const next = exists
@@ -101,8 +144,12 @@ export function appReducer(state: AppState, action: Action): AppState {
       }
     case 'set-time':
       return { ...state, currentTime: action.value }
+    case 'set-current-observation':
+      return { ...state, currentObservation: action.value }
     case 'set-time-window':
       return { ...state, timeWindow: action.value }
+    case 'set-impact-metric':
+      return { ...state, impactMetric: action.value }
     case 'set-scenario':
       return { ...state, selectedScenarioId: action.scenarioId }
     case 'set-playing':
