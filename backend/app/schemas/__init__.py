@@ -53,7 +53,7 @@ from .trajectory import (
     TrajectoryMatchRequest,
     TrajectoryMatchResponse,
 )
-from .wind import WindFrame, WindFrameReference, WindManifest, WindMode
+from .wind import WindCapability, WindFrame, WindFrameReference, WindManifest, WindMode
 
 __all__ = [
     "AreaGeometry",
@@ -109,6 +109,7 @@ __all__ = [
     "TrajectoryMatchResponse",
     "WindFrame",
     "WindFrameReference",
+    "WindCapability",
     "WindManifest",
     "WindMode",
 ]

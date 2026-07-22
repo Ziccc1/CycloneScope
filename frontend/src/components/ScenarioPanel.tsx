@@ -14,6 +14,13 @@ interface Props {
   onRefresh: () => void
 }
 
+interface FacilityPreview {
+  facilityId: string
+  lon: number
+  lat: number
+  radiusKm: number
+}
+
 const facilityLabels: Record<FacilityType, string> = {
   shelter: '避难所',
   medical: '医疗',
@@ -30,9 +37,12 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
   const [facilityType, setFacilityType] = useState<FacilityType>('shelter')
   const [lon, setLon] = useState(121.6)
   const [lat, setLat] = useState(24)
+  const [capacity, setCapacity] = useState(500)
+  const [serviceRadius, setServiceRadius] = useState(5)
   const [atRisk, setAtRisk] = useState(1000)
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+  const [preview, setPreview] = useState<FacilityPreview | null>(null)
 
   async function loadDetail(id: string | null) {
     if (!id) {
@@ -52,6 +62,30 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
   useEffect(() => {
     void loadDetail(state.selectedScenarioId)
   }, [state.selectedScenarioId])
+
+  useEffect(() => {
+    const onPreview = (event: Event) => {
+      const detail = (event as CustomEvent<FacilityPreview>).detail
+      setPreview(detail)
+    }
+    const onCommitted = (event: Event) => {
+      const detail = (event as CustomEvent<{ facilityId: string; lon: number; lat: number }>).detail
+      setPreview({ ...detail, radiusKm: preview?.radiusKm ?? 0 })
+      if (!state.selectedScenarioId) return
+      void scenarioApi.evaluate(state.selectedScenarioId, {
+        at_risk_population: atRisk,
+        hazard_threshold: 0.5,
+      }).then(setEvaluation).catch(() => undefined)
+      setMessage('设施已移动，覆盖范围和评估结果已更新')
+      onRefresh()
+    }
+    window.addEventListener('scenario-facility-preview', onPreview)
+    window.addEventListener('scenario-facility-committed', onCommitted)
+    return () => {
+      window.removeEventListener('scenario-facility-preview', onPreview)
+      window.removeEventListener('scenario-facility-committed', onCommitted)
+    }
+  }, [atRisk, onRefresh, preview?.radiusKm, state.selectedScenarioId])
 
   async function perform(
     action: () => Promise<unknown>,
@@ -105,9 +139,9 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
       type: facilityType,
       lon,
       lat,
-      capacity_value: null,
-      capacity_unit: null,
-      service_radius_km: null,
+      capacity_value: capacity,
+      capacity_unit: 'people',
+      service_radius_km: serviceRadius,
       budget_points: null,
     }
     await perform(
@@ -190,6 +224,13 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
 
       {detail && (
         <>
+          {preview && (
+            <div className="scenario-preview" role="status">
+              <strong>正在预览设施影响</strong>
+              <span>{preview.lon.toFixed(4)}°E, {preview.lat.toFixed(4)}°N</span>
+              <small>服务范围 {preview.radiusKm > 0 ? `${preview.radiusKm} km` : '未设置'} · 松开鼠标后保存并重新评估</small>
+            </div>
+          )}
           <div className="button-row">
             <button disabled={busy} type="button" onClick={renameScenario}>
               使用当前名称重命名
@@ -233,6 +274,26 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 max="90"
                 value={lat}
                 onChange={(event) => setLat(Number(event.target.value))}
+              />
+            </label>
+            <label>
+              容量（人）
+              <input
+                type="number"
+                min="1"
+                step="50"
+                value={capacity}
+                onChange={(event) => setCapacity(Number(event.target.value))}
+              />
+            </label>
+            <label>
+              服务半径（km）
+              <input
+                type="number"
+                min="0.5"
+                step="0.5"
+                value={serviceRadius}
+                onChange={(event) => setServiceRadius(Number(event.target.value))}
               />
             </label>
             <button disabled={busy} type="submit">

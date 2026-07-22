@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { buildQuery, getJson, scenarioApi } from './api'
 import AppShell from './components/AppShell'
+import MapView from './components/MapView'
 import { useResource } from './hooks/useResource'
 import {
   AppStateProvider,
@@ -21,6 +22,7 @@ function Dashboard() {
   const stormUrl = useMemo(
     () =>
       buildQuery('/api/storms', {
+        classic: true,
         basin: state.filters.basins[0],
         season_from: state.filters.seasonRange[0],
         season_to: state.filters.seasonRange[1],
@@ -90,6 +92,11 @@ function Dashboard() {
       scenarios={scenarios.data ?? []}
       loading={loading}
       error={error}
+      slots={{
+        map: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
+        wind: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
+        trajectory: <MapView storms={storms.data?.items ?? []} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
+      }}
       onRefreshScenarios={refreshScenarios}
       onDemoPreset={() => void loadDemoPreset()}
     />

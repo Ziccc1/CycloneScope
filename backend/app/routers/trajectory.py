@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..dependencies import get_repository, get_trajectory_matcher
 from ..repository import DataRepository
@@ -21,4 +21,7 @@ def trajectory_match(
     repository: DataRepository = Depends(get_repository),
     matcher: TrajectoryMatcher = Depends(get_trajectory_matcher),
 ):
-    return matcher.match(payload, repository.list_storms())
+    try:
+        return matcher.match(payload, repository.list_storms())
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
