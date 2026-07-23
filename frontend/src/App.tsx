@@ -19,24 +19,29 @@ function Dashboard() {
   const state = useAppState()
   const dispatch = useAppDispatch()
   const [scenarioVersion, setScenarioVersion] = useState(0)
-  const stormUrl = useMemo(
+  const classicStormUrl = useMemo(
     () =>
       buildQuery('/api/storms', {
         classic: true,
-        basin: state.filters.basins[0],
-        season_from: state.filters.seasonRange[0],
-        season_to: state.filters.seasonRange[1],
-        min_wind_ms: state.filters.minWindMs || undefined,
+        basin: state.selectedBasin,
+        season_from: state.selectedYearRange[0],
+        season_to: state.selectedYearRange[1],
+        min_wind_ms: state.minWindMs || undefined,
       }),
-    [state.filters],
+    [state.minWindMs, state.selectedBasin, state.selectedYearRange],
   )
   const health = useResource<HealthResponse>(
     (signal) => getJson('/api/health', signal),
     [],
   )
-  const storms = useResource<StormCatalogResponse>(
-    (signal) => getJson(stormUrl, signal),
-    [stormUrl],
+  const allStorms = useResource<StormCatalogResponse>(
+    (signal) => getJson('/api/storms', signal),
+    [],
+    (value) => value.items.length === 0,
+  )
+  const classicStorms = useResource<StormCatalogResponse>(
+    (signal) => getJson(classicStormUrl, signal),
+    [classicStormUrl],
     (value) => value.items.length === 0,
   )
   const sources = useResource<DataSourceListResponse>(
@@ -77,25 +82,34 @@ function Dashboard() {
     dispatch({ type: 'set-scenario', scenarioId: scenario.id })
   }
 
-  const error = [health.error, storms.error, sources.error, scenarios.error]
+  const filteredMapStorms = useMemo(() => (allStorms.data?.items ?? []).filter((storm) =>
+    storm.season >= state.selectedYearRange[0]
+    && storm.season <= state.selectedYearRange[1]
+    && (!state.selectedBasin || storm.basin === state.selectedBasin)
+    && (storm.max_wind_ms == null || storm.max_wind_ms >= state.minWindMs)), [allStorms.data, state.minWindMs, state.selectedBasin, state.selectedYearRange])
+
+  const error = [health.error, allStorms.error, classicStorms.error, sources.error, scenarios.error]
     .filter(Boolean)
     .join('；')
-  const loading = [health.status, storms.status, sources.status].some(
+  const loading = [health.status, allStorms.status, classicStorms.status, sources.status].some(
     (status) => status === 'loading' || status === 'stale',
   )
 
   return (
     <AppShell
       health={health.data}
-      storms={storms.data?.items ?? []}
+      storms={classicStorms.data?.items ?? []}
+      allStorms={allStorms.data?.items ?? []}
+      allStormsStatus={allStorms.status}
+      allStormsError={allStorms.error}
       sources={sources.data}
       scenarios={scenarios.data ?? []}
       loading={loading}
       error={error}
       slots={{
-        map: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
-        wind: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
-        trajectory: <MapView storms={storms.data?.items ?? []} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
+        map: <MapView storms={filteredMapStorms} windMode scenarioVersion={scenarioVersion} />,
+        wind: <MapView storms={filteredMapStorms} windMode scenarioVersion={scenarioVersion} />,
+        trajectory: <MapView storms={filteredMapStorms} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
       }}
       onRefreshScenarios={refreshScenarios}
       onDemoPreset={() => void loadDemoPreset()}

@@ -4,7 +4,7 @@ import type { Feature, FeatureCollection, LineString, Point, Polygon } from 'geo
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { ApiError, dataApi, scenarioApi } from '../api'
 import { useAppDispatch, useAppState, type ImpactMetric } from '../state/AppState'
-import type { StormSummary, TrackPoint, TrajectoryMatchRequest, TrajectoryMatchResponse, WindManifest } from '../types/contracts'
+import type { StormSummary, TrackPoint, TrajectoryMatchRequest, WindManifest } from '../types/contracts'
 import WindOverlay from './WindOverlay'
 
 interface Props {
@@ -519,7 +519,6 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
   const [reportedDamageAvailable, setReportedDamageAvailable] = useState(false)
   const [drawMatchMode, setDrawMatchMode] = useState<TrajectoryMatchRequest['mode']>('geographic')
   const [drawPoints, setDrawPoints] = useState<{ lon: number; lat: number }[]>([])
-  const [drawResult, setDrawResult] = useState<TrajectoryMatchResponse | null>(null)
   const [drawMatching, setDrawMatching] = useState(false)
   const drawingRef = useRef(false)
   const drawnPointsRef = useRef<{ lon: number; lat: number }[]>([])
@@ -700,7 +699,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     setSourceData(map, 'drawn-trajectory', EMPTY)
     drawnPointsRef.current = []
     setDrawPoints([])
-    setDrawResult(null)
+    dispatch({ type: 'set-trajectory-match', value: null })
     if (!drawMode) return
 
     map.easeTo({ center: [120, 18], zoom: 1.2, duration: 500 })
@@ -713,7 +712,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
       lastPoint = null
       drawnPointsRef.current = []
       setDrawPoints([])
-      setDrawResult(null)
+      dispatch({ type: 'set-trajectory-match-status', status: 'loading' })
       event.preventDefault()
     }
     const onMove = (event: maplibregl.MapMouseEvent) => {
@@ -744,13 +743,19 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         points: drawnPointsRef.current,
         top_k: 5,
         filters: {
-          basins: state.filters.basins as NonNullable<TrajectoryMatchRequest['filters']>['basins'],
-          season_from: state.filters.seasonRange[0],
-          season_to: state.filters.seasonRange[1],
+          basins: (state.selectedBasin ? [state.selectedBasin] : []) as NonNullable<TrajectoryMatchRequest['filters']>['basins'],
+          season_from: state.selectedYearRange[0],
+          season_to: state.selectedYearRange[1],
         },
       }, undefined)
-        .then((response) => setDrawResult(response))
-        .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : String(cause)))
+        .then((response) => {
+          dispatch({ type: 'set-trajectory-match', value: response, status: 'ready' })
+        })
+        .catch((cause: unknown) => {
+          const message = cause instanceof Error ? cause.message : String(cause)
+          setError(message)
+          dispatch({ type: 'set-trajectory-match-status', status: 'error', error: message })
+        })
         .finally(() => setDrawMatching(false))
     }
     map.on('mousedown', onDown)
@@ -764,7 +769,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
       map.off('mousemove', onMove)
       map.off('mouseup', onUp)
     }
-  }, [drawMatchMode, drawMode, mapReady])
+  }, [dispatch, drawMatchMode, drawMode, mapReady, state.selectedBasin, state.selectedYearRange])
 
   useEffect(() => {
     if (!mapReady) return
@@ -899,24 +904,24 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     }
     const controller = new AbortController()
     Promise.all([
-      dataApi.impact({ storm_id: selected.id, metric: state.impactMetric }, controller.signal),
+      dataApi.impact({ storm_id: selected.id, metric: state.selectedImpactMetric }, controller.signal),
       dataApi.taiwanZones({}, controller.signal),
     ])
       .then(([gridResponse, zonesResponse]) => {
         const grid = gridResponse as unknown as FeatureCollection
         const zones = zonesResponse as unknown as FeatureCollection
-        const regions = buildImpactRegions(zones, grid, state.impactMetric)
+        const regions = buildImpactRegions(zones, grid, state.selectedImpactMetric)
         setSourceData(mapRef.current, 'impact-regions', regions)
-        const hasMetric = grid.features.some((feature) => feature.properties?.[state.impactMetric] != null)
+        const hasMetric = grid.features.some((feature) => feature.properties?.[state.selectedImpactMetric] != null)
         const hasReportedDamage = grid.features.some((feature) => feature.properties?.reported_damage_usd != null)
         const coloredRegions = regions.features.filter((feature) => feature.properties?.impact_value != null).length
         setReportedDamageAvailable(hasReportedDamage)
         setImpactStatus(
           hasMetric
             ? `${coloredRegions}/${regions.features.length} 行政区 · 中心点采样`
-            : `${IMPACT_METRICS[state.impactMetric].label}：未提供`,
+            : `${IMPACT_METRICS[state.selectedImpactMetric].label}：未提供`,
         )
-        if (state.impactMetric === 'reported_damage_usd' && !hasReportedDamage) {
+        if (state.selectedImpactMetric === 'reported_damage_usd' && !hasReportedDamage) {
           dispatch({ type: 'set-impact-metric', value: 'hazard_index' })
         }
       })
@@ -929,7 +934,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         setImpactStatus('区域影响图层不可用')
       })
     return () => controller.abort()
-  }, [dispatch, mapReady, selected?.id, selected?.impact_available, state.impactMetric, state.layers.impact.visible])
+  }, [dispatch, mapReady, selected?.id, selected?.impact_available, state.selectedImpactMetric, state.layers.impact.visible])
 
   useEffect(() => {
     if (!windMode) {
@@ -982,7 +987,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     if (!mapReady || !map) return
     map.setPaintProperty('track-context', 'line-opacity', state.layers.tracks.visible ? state.layers.tracks.opacity * 0.42 : 0)
     map.setPaintProperty('storm-track', 'line-opacity', state.layers.tracks.visible ? state.layers.tracks.opacity : 0)
-    map.setPaintProperty('impact-regions-fill', 'fill-color', impactColor(state.impactMetric))
+    map.setPaintProperty('impact-regions-fill', 'fill-color', impactColor(state.selectedImpactMetric))
     map.setPaintProperty('impact-regions-fill', 'fill-opacity', state.layers.impact.visible ? state.layers.impact.opacity : 0)
     map.setPaintProperty('impact-regions-line', 'line-opacity', state.layers.impact.visible ? 0.42 : 0)
     map.setPaintProperty('global-impact-fill', 'fill-color', impactColor('hazard_index'))
@@ -998,14 +1003,14 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     map.setPaintProperty('facility-cluster-count', 'text-opacity', state.layers.facilities.opacity)
     map.setLayoutProperty('facility-clusters', 'visibility', state.layers.facilities.visible ? 'visible' : 'none')
     map.setLayoutProperty('facility-cluster-count', 'visibility', state.layers.facilities.visible ? 'visible' : 'none')
-  }, [mapReady, state.impactMetric, state.layers, state.mode])
+  }, [mapReady, state.selectedImpactMetric, state.layers, state.mode])
 
   const capability = state.mode === 'overview'
     ? windManifest?.capability ?? '未加载'
     : !selected?.wind_available
       ? 'none'
       : windManifest?.capability ?? '未加载'
-  const impactDefinition = IMPACT_METRICS[state.impactMetric]
+  const impactDefinition = IMPACT_METRICS[state.selectedImpactMetric]
   const impactLayerActive = state.layers.impact.visible && (state.mode !== 'overview' && Boolean(selected?.impact_available))
 
   return (
@@ -1065,38 +1070,16 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
               onClick={() => {
                 drawnPointsRef.current = []
                 setDrawPoints([])
-                setDrawResult(null)
+                dispatch({ type: 'set-trajectory-match', value: null })
                 setSourceData(mapRef.current, 'drawn-trajectory', EMPTY)
               }}
             >清除</button>
           </div>
           {drawMatching && <small className="draw-match-status">正在匹配 A7 轨迹特征…</small>}
-          {drawResult && !drawMatching && (
-            <div className="draw-match-results">
-              <div className="draw-match-result-meta">已匹配 {drawResult.items.length} 个候选 · {drawResult.elapsed_ms.toFixed(1)} ms</div>
-              {drawResult.items.map((item) => {
-                const storm = storms.find((candidate) => candidate.id === item.storm_id)
-                return (
-                  <button
-                    type="button"
-                    className="draw-match-result"
-                    key={item.storm_id}
-                    onClick={() => storm && dispatch({ type: 'select-storm', stormId: storm.id })}
-                  >
-                    <span><b>#{item.rank}</b> {storm?.name ?? item.storm_id}</span>
-                    <strong>{Math.round(item.similarity * 100)}%</strong>
-                    <small>{storm ? `${storm.basin} · ${storm.season} · 形态 ${Math.round(item.frechet_component * 100)} · 方向 ${Math.round(item.direction_component * 100)}` : item.explanation}</small>
-                  </button>
-                )
-              })}
-              {drawResult.items[0] && (
-                <p className="draw-match-story">
-                  叙事线索：这条手绘路径与「{storms.find((storm) => storm.id === drawResult.items[0].storm_id)?.name ?? drawResult.items[0].storm_id}」最接近；
-                  形态相似度 {Math.round(drawResult.items[0].frechet_component * 100)}%，移动方向一致性 {Math.round(drawResult.items[0].direction_component * 100)}%。
-                  点击候选可在右侧查看该事件的时间、风速、气压和完整轨迹。
-                </p>
-              )}
-            </div>
+          {state.trajectoryMatch && !drawMatching && (
+            <small className="draw-match-status">
+              已匹配 {state.trajectoryMatch.items.length} 个候选，完整结果见右侧“相似轨迹”列表。
+            </small>
           )}
         </div>
       )}
@@ -1104,7 +1087,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         <label className="map-metric-control">
           <span>影响指标</span>
           <select
-            value={state.impactMetric}
+            value={state.selectedImpactMetric}
             onChange={(event) => dispatch({ type: 'set-impact-metric', value: event.target.value as ImpactMetric })}
           >
             {(Object.entries(IMPACT_METRICS) as [ImpactMetric, (typeof IMPACT_METRICS)[ImpactMetric]][])

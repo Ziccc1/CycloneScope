@@ -180,6 +180,8 @@ def test_match_score_uses_documented_components():
             "rank": 1,
             "similarity": 0.8,
             "frechet_component": 0.8,
+            "geographic_component": 0.8,
+            "shape_component": 0.8,
             "direction_component": 0.8,
             "explanation": "components agree",
         }
@@ -193,6 +195,8 @@ def test_match_score_uses_documented_components():
                 "rank": 1,
                 "similarity": 0.9,
                 "frechet_component": 0.8,
+                "geographic_component": 0.8,
+                "shape_component": 0.8,
                 "direction_component": 0.8,
                 "explanation": "inconsistent total",
             }

@@ -66,4 +66,6 @@ def test_processed_trajectory_matcher_uses_a7_features(tmp_path):
     )
     assert result["items"][0]["storm_id"] == "storm-1"
     assert result["items"][0]["similarity"] == 1.0
+    assert result["items"][0]["geographic_component"] == 1.0
+    assert result["items"][0]["shape_component"] == 1.0
     assert result["source_ids"] == ["ibtracs_since1980", "a7_track_features"]

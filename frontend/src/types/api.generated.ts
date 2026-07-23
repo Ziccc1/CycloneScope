@@ -1409,8 +1409,12 @@ export interface components {
             explanation: string;
             /** Frechet Component */
             frechet_component: number;
+            /** Geographic Component */
+            geographic_component: number;
             /** Rank */
             rank: number;
+            /** Shape Component */
+            shape_component: number;
             /** Similarity */
             similarity: number;
             /** Storm Id */
