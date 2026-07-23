@@ -13,6 +13,16 @@ export type AnalysisMode =
   | 'draw-match'
   | 'taiwan-scenario'
 
+export type StoryStage =
+  | 'global'
+  | 'event'
+  | 'similarity'
+  | 'impact'
+  | 'regional'
+  | 'response'
+
+export type FacilitySelection = 'shelter' | 'medical' | 'rescue'
+
 export interface LayerState {
   visible: boolean
   opacity: number
@@ -38,18 +48,24 @@ export interface CurrentObservation {
 }
 
 export interface AppState {
+  storyStage: StoryStage
   mode: AnalysisMode
+  selectedBasin: string | null
+  selectedYearRange: [number, number]
   selectedStormId: string | null
+  selectedZoneId: string | null
+  selectedMatchId: string | null
+  selectedFacilityType: FacilitySelection
+  scenarioView: 'baseline' | 'current'
   comparisonStormIds: string[]
   currentTime: string | null
   currentObservation: CurrentObservation | null
   timeWindow: { start: string; end: string } | null
-  impactMetric: ImpactMetric
-  filters: {
-    basins: string[]
-    seasonRange: [number, number]
-    minWindMs: number
-  }
+  selectedImpactMetric: ImpactMetric
+  minWindMs: number
+  trajectoryMatch: import('../types/contracts').TrajectoryMatchResponse | null
+  trajectoryMatchStatus: 'idle' | 'loading' | 'ready' | 'error'
+  trajectoryMatchError: string
   layers: Record<'tracks' | 'wind' | 'impact' | 'facilities', LayerState>
   selectedScenarioId: string | null
   isPlaying: boolean
@@ -57,35 +73,53 @@ export interface AppState {
 }
 
 type Action =
+  | { type: 'set-story-stage'; stage: StoryStage }
   | { type: 'set-mode'; mode: AnalysisMode }
   | { type: 'select-storm'; stormId: string | null }
+  | { type: 'select-zone'; zoneId: string | null }
+  | { type: 'select-match'; stormId: string | null }
   | { type: 'toggle-comparison'; stormId: string }
-  | { type: 'set-basins'; basins: string[] }
-  | { type: 'set-season-range'; range: [number, number] }
+  | { type: 'set-basin'; basin: string | null }
+  | { type: 'set-year-range'; range: [number, number] }
   | { type: 'set-min-wind'; value: number }
   | { type: 'set-layer'; layer: keyof AppState['layers']; value: Partial<LayerState> }
   | { type: 'set-time'; value: string | null }
   | { type: 'set-current-observation'; value: CurrentObservation | null }
   | { type: 'set-time-window'; value: AppState['timeWindow'] }
   | { type: 'set-impact-metric'; value: ImpactMetric }
+  | { type: 'set-facility-type'; value: FacilitySelection }
+  | { type: 'set-scenario-view'; value: 'baseline' | 'current' }
+  | {
+      type: 'set-trajectory-match'
+      value: import('../types/contracts').TrajectoryMatchResponse | null
+      status?: AppState['trajectoryMatchStatus']
+      error?: string
+    }
+  | { type: 'set-trajectory-match-status'; status: AppState['trajectoryMatchStatus']; error?: string }
   | { type: 'set-scenario'; scenarioId: string | null }
   | { type: 'set-playing'; value: boolean }
   | { type: 'set-speed'; value: number }
   | { type: 'load-demo-preset' }
 
 export const initialState: AppState = {
+  storyStage: 'global',
   mode: 'overview',
+  selectedBasin: null,
+  selectedYearRange: [1840, 2200],
   selectedStormId: null,
+  selectedZoneId: null,
+  selectedMatchId: null,
+  selectedFacilityType: 'shelter',
+  scenarioView: 'current',
   comparisonStormIds: [],
   currentTime: null,
   currentObservation: null,
   timeWindow: null,
-  impactMetric: 'hazard_index',
-  filters: {
-    basins: [],
-    seasonRange: [1840, 2200],
-    minWindMs: 0,
-  },
+  selectedImpactMetric: 'hazard_index',
+  minWindMs: 0,
+  trajectoryMatch: null,
+  trajectoryMatchStatus: 'idle',
+  trajectoryMatchError: '',
   layers: {
     tracks: { visible: true, opacity: 0.75 },
     wind: { visible: true, opacity: 0.45 },
@@ -99,28 +133,59 @@ export const initialState: AppState = {
 
 export function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case 'set-story-stage': {
+      const mode: AnalysisMode =
+        action.stage === 'global'
+          ? 'overview'
+          : action.stage === 'similarity'
+            ? 'draw-match'
+            : action.stage === 'regional' || action.stage === 'response'
+              ? 'taiwan-scenario'
+              : 'storm'
+      return {
+        ...state,
+        storyStage: action.stage,
+        mode,
+        isPlaying: action.stage === 'event' ? state.isPlaying : false,
+      }
+    }
     case 'set-mode':
       return action.mode === 'overview'
         ? {
             ...state,
             mode: action.mode,
+            storyStage: 'global',
             selectedStormId: null,
             currentTime: null,
             currentObservation: null,
             timeWindow: null,
             isPlaying: false,
           }
-        : { ...state, mode: action.mode }
+        : {
+            ...state,
+            mode: action.mode,
+            storyStage:
+              action.mode === 'draw-match'
+                ? 'similarity'
+                : action.mode === 'taiwan-scenario'
+                  ? 'regional'
+                  : 'event',
+          }
     case 'select-storm':
       return {
         ...state,
         selectedStormId: action.stormId,
         mode: action.stormId ? 'storm' : state.mode,
+        storyStage: action.stormId ? 'event' : state.storyStage,
         currentTime: null,
         currentObservation: null,
         timeWindow: null,
         isPlaying: false,
       }
+    case 'select-zone':
+      return { ...state, selectedZoneId: action.zoneId }
+    case 'select-match':
+      return { ...state, selectedMatchId: action.stormId }
     case 'toggle-comparison': {
       const exists = state.comparisonStormIds.includes(action.stormId)
       const next = exists
@@ -128,12 +193,12 @@ export function appReducer(state: AppState, action: Action): AppState {
         : [...state.comparisonStormIds, action.stormId].slice(-2)
       return { ...state, comparisonStormIds: next }
     }
-    case 'set-basins':
-      return { ...state, filters: { ...state.filters, basins: action.basins } }
-    case 'set-season-range':
-      return { ...state, filters: { ...state.filters, seasonRange: action.range } }
+    case 'set-basin':
+      return { ...state, selectedBasin: action.basin }
+    case 'set-year-range':
+      return { ...state, selectedYearRange: action.range }
     case 'set-min-wind':
-      return { ...state, filters: { ...state.filters, minWindMs: action.value } }
+      return { ...state, minWindMs: action.value }
     case 'set-layer':
       return {
         ...state,
@@ -149,7 +214,24 @@ export function appReducer(state: AppState, action: Action): AppState {
     case 'set-time-window':
       return { ...state, timeWindow: action.value }
     case 'set-impact-metric':
-      return { ...state, impactMetric: action.value }
+      return { ...state, selectedImpactMetric: action.value }
+    case 'set-facility-type':
+      return { ...state, selectedFacilityType: action.value }
+    case 'set-scenario-view':
+      return { ...state, scenarioView: action.value }
+    case 'set-trajectory-match':
+      return {
+        ...state,
+        trajectoryMatch: action.value,
+        trajectoryMatchStatus: action.status ?? (action.value ? 'ready' : 'idle'),
+        trajectoryMatchError: action.error ?? '',
+      }
+    case 'set-trajectory-match-status':
+      return {
+        ...state,
+        trajectoryMatchStatus: action.status,
+        trajectoryMatchError: action.error ?? '',
+      }
     case 'set-scenario':
       return { ...state, selectedScenarioId: action.scenarioId }
     case 'set-playing':
@@ -159,6 +241,7 @@ export function appReducer(state: AppState, action: Action): AppState {
     case 'load-demo-preset':
       return {
         ...initialState,
+        storyStage: 'event',
         mode: 'storm',
         selectedStormId: 'demo-morakot-2009',
         currentTime: '2009-08-07T00:00:00Z',
@@ -166,7 +249,8 @@ export function appReducer(state: AppState, action: Action): AppState {
           start: '2009-08-05T00:00:00Z',
           end: '2009-08-08T00:00:00Z',
         },
-        filters: { basins: ['WP'], seasonRange: [2000, 2020], minWindMs: 0 },
+        selectedBasin: 'WP',
+        selectedYearRange: [2000, 2020],
         layers: {
           ...initialState.layers,
           impact: { visible: true, opacity: 0.68 },

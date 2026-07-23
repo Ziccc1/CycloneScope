@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { useAppDispatch, useAppState, type AnalysisMode } from '../state/AppState'
+import { useAppDispatch, useAppState, type StoryStage } from '../state/AppState'
 import type {
   DataSourceListResponse,
   HealthResponse,
@@ -8,6 +8,12 @@ import type {
   StormSummary,
 } from '../types/contracts'
 import ScenarioPanel from './ScenarioPanel'
+import GlobalCycloneOverview from './charts/GlobalCycloneOverview'
+import BasinComparison from './charts/BasinComparison'
+import StormImpactComparison from './charts/StormImpactComparison'
+import StormComparisonCharts from './charts/StormComparisonCharts'
+import CoverageGapTable from './panels/CoverageGapTable'
+import TrajectoryMatchList from './panels/TrajectoryMatchList'
 
 export interface FeatureSlots {
   map?: ReactNode
@@ -19,6 +25,9 @@ export interface FeatureSlots {
 interface Props {
   health: HealthResponse | null
   storms: StormSummary[]
+  allStorms: StormSummary[]
+  allStormsStatus: 'idle' | 'loading' | 'ready' | 'empty' | 'error' | 'stale'
+  allStormsError: string
   sources: DataSourceListResponse | null
   scenarios: ScenarioRead[]
   loading: boolean
@@ -28,11 +37,13 @@ interface Props {
   onDemoPreset: () => void
 }
 
-const modes: { value: AnalysisMode; label: string }[] = [
-  { value: 'overview', label: '全球概览' },
-  { value: 'storm', label: '单场分析' },
-  { value: 'draw-match', label: '手绘匹配' },
-  { value: 'taiwan-scenario', label: '台湾情景' },
+const stages: { value: StoryStage; label: string }[] = [
+  { value: 'global', label: '全球格局' },
+  { value: 'event', label: '单场过程' },
+  { value: 'similarity', label: '历史比较' },
+  { value: 'impact', label: '灾害影响' },
+  { value: 'regional', label: '区域案例' },
+  { value: 'response', label: '响应方案' },
 ]
 
 const layerLabels = {
@@ -49,6 +60,9 @@ function valueOrDash(value: number | null | undefined, suffix = '') {
 export default function AppShell({
   health,
   storms,
+  allStorms,
+  allStormsStatus,
+  allStormsError,
   sources,
   scenarios,
   loading,
@@ -59,13 +73,7 @@ export default function AppShell({
 }: Props) {
   const state = useAppState()
   const dispatch = useAppDispatch()
-  const selected = storms.find((storm) => storm.id === state.selectedStormId) ?? null
-  const compared = [
-    selected,
-    ...state.comparisonStormIds
-      .map((id) => storms.find((storm) => storm.id === id) ?? null)
-      .filter((storm): storm is StormSummary => Boolean(storm)),
-  ].filter((storm): storm is StormSummary => Boolean(storm))
+  const selected = allStorms.find((storm) => storm.id === state.selectedStormId) ?? null
   const activeStart = state.timeWindow?.start ?? selected?.start_time ?? null
   const activeEnd = state.timeWindow?.end ?? selected?.end_time ?? null
   const activeTime = state.currentTime ?? activeStart
@@ -117,6 +125,50 @@ export default function AppShell({
     )
   }
 
+  function renderBAnalysis() {
+    if (state.storyStage === 'global') {
+      return <>
+        <GlobalCycloneOverview storms={allStorms} status={allStormsStatus} error={allStormsError} />
+        <BasinComparison storms={allStorms} />
+      </>
+    }
+    if (state.storyStage === 'similarity') return <TrajectoryMatchList storms={allStorms} />
+    if (state.storyStage === 'impact') return <StormImpactComparison storms={storms} />
+    if (state.storyStage === 'regional') return <CoverageGapTable selectedStormImpactAvailable={Boolean(selected?.impact_available)} />
+    if (state.storyStage === 'response') {
+      return <>
+        <ScenarioPanel scenarios={scenarios} onRefresh={onRefreshScenarios} />
+        <CoverageGapTable selectedStormImpactAvailable={Boolean(selected?.impact_available)} />
+      </>
+    }
+    return <>
+      <section>
+        <div className="panel-heading">
+          <div><p className="eyebrow">EVENT PROFILE</p><h2>事件详情</h2></div>
+          <span className="tag">{selected?.data_status ?? '未选择'}</span>
+        </div>
+        {!selected ? (
+          <p className="empty">从左侧选择一场气旋查看指标。</p>
+        ) : (
+          <>
+            <div className="metric-grid">
+              <div><span>当前风速</span><strong>{valueOrDash(state.currentObservation?.wind_ms)}</strong><small>m/s</small></div>
+              <div><span>当前气压</span><strong>{valueOrDash(state.currentObservation?.pressure_hpa)}</strong><small>hPa</small></div>
+              <div><span>类别</span><strong className="metric-text">{state.currentObservation?.category ?? '—'}</strong><small>真实观测</small></div>
+              <div><span>移动速度</span><strong>{valueOrDash(state.currentObservation?.moving_speed_kmh)}</strong><small>km/h</small></div>
+              <div><span>观测机构</span><strong className="metric-text">{state.currentObservation?.source_agency ?? '—'}</strong><small>来源</small></div>
+              <div><span>观测时间</span><strong className="metric-time">{state.currentObservation?.time.slice(0, 16).replace('T', ' ') ?? '—'}</strong><small>UTC</small></div>
+            </div>
+            <p className="event-summary">
+              全程最大风速 {valueOrDash(selected.max_wind_ms, ' m/s')} · 最低气压 {valueOrDash(selected.min_pressure_hpa, ' hPa')} · ACE {valueOrDash(selected.ace)}
+            </p>
+          </>
+        )}
+      </section>
+      <StormComparisonCharts storms={allStorms} />
+    </>
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -127,15 +179,15 @@ export default function AppShell({
             <h1>风迹</h1>
           </div>
         </div>
-        <nav className="mode-tabs" aria-label="分析模式">
-          {modes.map((mode) => (
+        <nav className="mode-tabs story-stage-tabs" aria-label="分析尺度">
+          {stages.map((stage) => (
             <button
-              key={mode.value}
+              key={stage.value}
               type="button"
-              aria-pressed={state.mode === mode.value}
-              onClick={() => dispatch({ type: 'set-mode', mode: mode.value })}
+              aria-pressed={state.storyStage === stage.value}
+              onClick={() => dispatch({ type: 'set-story-stage', stage: stage.value })}
             >
-              {mode.label}
+              {stage.label}
             </button>
           ))}
         </nav>
@@ -167,11 +219,11 @@ export default function AppShell({
             <label>
               海盆
               <select
-                value={state.filters.basins[0] ?? ''}
+                value={state.selectedBasin ?? ''}
                 onChange={(event) =>
                   dispatch({
-                    type: 'set-basins',
-                    basins: event.target.value ? [event.target.value] : [],
+                    type: 'set-basin',
+                    basin: event.target.value || null,
                   })
                 }
               >
@@ -186,12 +238,12 @@ export default function AppShell({
                 <input
                   type="number"
                   min="1840"
-                  max={state.filters.seasonRange[1]}
-                  value={state.filters.seasonRange[0]}
+                  max={state.selectedYearRange[1]}
+                  value={state.selectedYearRange[0]}
                   onChange={(event) =>
                     dispatch({
-                      type: 'set-season-range',
-                      range: [Number(event.target.value), state.filters.seasonRange[1]],
+                      type: 'set-year-range',
+                      range: [Number(event.target.value), state.selectedYearRange[1]],
                     })
                   }
                 />
@@ -200,25 +252,25 @@ export default function AppShell({
                 结束年份
                 <input
                   type="number"
-                  min={state.filters.seasonRange[0]}
+                  min={state.selectedYearRange[0]}
                   max="2200"
-                  value={state.filters.seasonRange[1]}
+                  value={state.selectedYearRange[1]}
                   onChange={(event) =>
                     dispatch({
-                      type: 'set-season-range',
-                      range: [state.filters.seasonRange[0], Number(event.target.value)],
+                      type: 'set-year-range',
+                      range: [state.selectedYearRange[0], Number(event.target.value)],
                     })
                   }
                 />
               </label>
             </div>
             <label>
-              最小风速 <output>{state.filters.minWindMs} m/s</output>
+              最小风速 <output>{state.minWindMs} m/s</output>
               <input
                 type="range"
                 min="0"
                 max="100"
-                value={state.filters.minWindMs}
+                value={state.minWindMs}
                 onChange={(event) =>
                   dispatch({ type: 'set-min-wind', value: Number(event.target.value) })
                 }
@@ -309,69 +361,21 @@ export default function AppShell({
         </section>
 
         <aside className="right-panel panel">
-          {state.mode === 'taiwan-scenario' ? (
-            <ScenarioPanel scenarios={scenarios} onRefresh={onRefreshScenarios} />
-          ) : (
-            <>
-              <section>
-                <div className="panel-heading">
-                  <div><p className="eyebrow">EVENT PROFILE</p><h2>事件详情</h2></div>
-                  <span className="tag">{selected?.data_status ?? '未选择'}</span>
-                </div>
-                {!selected ? (
-                  <p className="empty">从左侧选择一场气旋查看指标。</p>
-                ) : (
-                  <>
-                    <div className="metric-grid">
-                      <div><span>当前风速</span><strong>{valueOrDash(state.currentObservation?.wind_ms)}</strong><small>m/s</small></div>
-                      <div><span>当前气压</span><strong>{valueOrDash(state.currentObservation?.pressure_hpa)}</strong><small>hPa</small></div>
-                      <div><span>类别</span><strong className="metric-text">{state.currentObservation?.category ?? '—'}</strong><small>真实观测</small></div>
-                      <div><span>移动速度</span><strong>{valueOrDash(state.currentObservation?.moving_speed_kmh)}</strong><small>km/h</small></div>
-                      <div><span>观测机构</span><strong className="metric-text">{state.currentObservation?.source_agency ?? '—'}</strong><small>来源</small></div>
-                      <div><span>观测时间</span><strong className="metric-time">{state.currentObservation?.time.slice(0, 16).replace('T', ' ') ?? '—'}</strong><small>UTC</small></div>
-                    </div>
-                    <p className="event-summary">
-                      全程最大风速 {valueOrDash(selected.max_wind_ms, ' m/s')} · 最低气压 {valueOrDash(selected.min_pressure_hpa, ' hPa')} · ACE {valueOrDash(selected.ace)}
-                    </p>
-                  </>
-                )}
-              </section>
-
-              <section>
-                <div className="panel-heading">
-                  <div><p className="eyebrow">COMPARISON</p><h2>事件对比</h2></div>
-                  <span className="count">{compared.length}/3</span>
-                </div>
-                <div className="comparison-chart">
-                  {compared.map((storm) => (
-                    <div key={storm.id}>
-                      <span>{storm.name}</span>
-                      <div className="bar-track">
-                        <i style={{ width: `${Math.min(100, storm.impact_score ?? 0)}%` }} />
-                      </div>
-                      <strong>{valueOrDash(storm.impact_score)}</strong>
-                    </div>
-                  ))}
-                  {compared.length === 0 && <p className="empty">选择事件并点击“对比”。</p>}
-                </div>
-              </section>
-
-              <section>
-                <div className="panel-heading">
-                  <div><p className="eyebrow">PROVENANCE</p><h2>数据来源</h2></div>
-                  <span className="count">{sources?.count ?? 0}</span>
-                </div>
-                <ul className="source-list">
-                  {sources?.items.slice(0, 5).map((source) => (
-                    <li key={source.id}>
-                      <a href={source.url} target="_blank" rel="noreferrer">{source.name}</a>
-                      <small>{source.status}</small>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </>
-          )}
+          {renderBAnalysis()}
+          <section>
+            <div className="panel-heading">
+              <div><p className="eyebrow">PROVENANCE</p><h2>数据来源</h2></div>
+              <span className="count">{sources?.count ?? 0}</span>
+            </div>
+            <ul className="source-list">
+              {sources?.items.slice(0, 5).map((source) => (
+                <li key={source.id}>
+                  <a href={source.url} target="_blank" rel="noreferrer">{source.name}</a>
+                  <small>{source.status}</small>
+                </li>
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
 
