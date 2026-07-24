@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+﻿from __future__ import annotations
+=======
 from __future__ import annotations
+>>>>>>> origin/main
 
 import os
 import math
@@ -30,6 +34,10 @@ def resolve_processed_root(configured: str | Path | None = None) -> Path:
         [
             PROJECT_ROOT / "output" / "processed",
             PROJECT_ROOT.parent / "CycloneScope-data-work" / "output" / "processed",
+<<<<<<< HEAD
+            PROJECT_ROOT.parent / "CycloneScope-data-delivery-v2.1" / "output" / "processed",
+=======
+>>>>>>> origin/main
             DEFAULT_PROCESSED_ROOT,
         ]
     )
@@ -78,3 +86,7 @@ def _normalize_value(value: Any) -> Any:
     if isinstance(value, dict):
         return {key: _normalize_value(item) for key, item in value.items()}
     return value
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main

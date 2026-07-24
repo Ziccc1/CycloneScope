@@ -1,6 +1,13 @@
 import { type FormEvent, useEffect, useState } from 'react'
+<<<<<<< HEAD
+import { dataApi, scenarioApi } from '../api'
+import { useAppDispatch, useAppState } from '../state/AppState'
+import { displayScenarioName } from './scenarioLabels'
+import { deriveRegionalRisk, type RegionalRiskAnalysis } from './a/riskAnalysis'
+=======
 import { scenarioApi } from '../api'
 import { useAppDispatch, useAppState } from '../state/AppState'
+>>>>>>> origin/main
 import type {
   EvaluationResponse,
   FacilityCreate,
@@ -28,23 +35,50 @@ const facilityLabels: Record<FacilityType, string> = {
   warehouse: '物资',
 }
 
+<<<<<<< HEAD
+const capacityUnits: Record<FacilityType, { unit: 'people' | 'beds' | 'teams' | 'people_day'; label: string; defaultValue: number; step: number }> = {
+  shelter: { unit: 'people', label: '容量（人）', defaultValue: 50000, step: 1 },
+  medical: { unit: 'beds', label: '床位数（张）', defaultValue: 50, step: 1 },
+  rescue: { unit: 'teams', label: '队伍数（支）', defaultValue: 5, step: 1 },
+  warehouse: { unit: 'people_day', label: '服务量（人·日）', defaultValue: 5000, step: 1 },
+}
+
+const capacityUnitLabels: Record<string, string> = { people: '人', beds: '张', teams: '支', people_day: '人·日' }
+
+=======
+>>>>>>> origin/main
 export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
   const state = useAppState()
   const dispatch = useAppDispatch()
   const [detail, setDetail] = useState<ScenarioDetail | null>(null)
   const [evaluation, setEvaluation] = useState<EvaluationResponse | null>(null)
+<<<<<<< HEAD
+  const [regionalEvaluation, setRegionalEvaluation] = useState<RegionalRiskAnalysis | null>(null)
+  const [localEvaluationVersion, setLocalEvaluationVersion] = useState(0)
+  const [name, setName] = useState('同预算配置探索')
+  const [facilityType, setFacilityType] = useState<FacilityType>('shelter')
+  const [lon, setLon] = useState<number | ''>(121.6)
+  const [lat, setLat] = useState<number | ''>(24)
+  const [capacity, setCapacity] = useState<number | ''>(50000)
+  const [serviceRadius, setServiceRadius] = useState<number | ''>(50)
+=======
   const [name, setName] = useState('台湾设施联调情景')
   const [facilityType, setFacilityType] = useState<FacilityType>('shelter')
   const [lon, setLon] = useState(121.6)
   const [lat, setLat] = useState(24)
   const [capacity, setCapacity] = useState(500)
   const [serviceRadius, setServiceRadius] = useState(5)
+>>>>>>> origin/main
   const [atRisk, setAtRisk] = useState(1000)
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [preview, setPreview] = useState<FacilityPreview | null>(null)
 
   async function loadDetail(id: string | null) {
+<<<<<<< HEAD
+    setMessage('')
+=======
+>>>>>>> origin/main
     if (!id) {
       setDetail(null)
       setEvaluation(null)
@@ -53,7 +87,11 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
     try {
       const selected = await scenarioApi.get(id)
       setDetail(selected)
+<<<<<<< HEAD
+      setName(displayScenarioName(selected.name))
+=======
       setName(selected.name)
+>>>>>>> origin/main
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : String(cause))
     }
@@ -64,6 +102,37 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
   }, [state.selectedScenarioId])
 
   useEffect(() => {
+<<<<<<< HEAD
+    if (!detail || !state.selectedStormId) {
+      setRegionalEvaluation(null)
+      return
+    }
+    const controller = new AbortController()
+    Promise.all([
+      dataApi.taiwanZones({}, controller.signal),
+      dataApi.impact({ storm_id: state.selectedStormId, metric: state.impactMetric }, controller.signal),
+      dataApi.taiwanFacilities({}, controller.signal),
+    ])
+      .then(([zones, impact, facilities]) => {
+        setRegionalEvaluation(deriveRegionalRisk({
+          zones,
+          impact,
+          facilities,
+          simulatedFacilities: detail.facilities ?? [],
+          facilityType: state.selectedFacilityType,
+          threshold: state.hazardThreshold,
+        }))
+      })
+      .catch((cause: unknown) => {
+        if (cause instanceof DOMException && cause.name === 'AbortError') return
+        setRegionalEvaluation(null)
+      })
+    return () => controller.abort()
+  }, [detail, localEvaluationVersion, state.hazardThreshold, state.impactMetric, state.selectedFacilityType, state.selectedStormId])
+
+  useEffect(() => {
+=======
+>>>>>>> origin/main
     const onPreview = (event: Event) => {
       const detail = (event as CustomEvent<FacilityPreview>).detail
       setPreview(detail)
@@ -77,6 +146,11 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
         hazard_threshold: 0.5,
       }).then(setEvaluation).catch(() => undefined)
       setMessage('设施已移动，覆盖范围和评估结果已更新')
+<<<<<<< HEAD
+      void loadDetail(state.selectedScenarioId)
+      setLocalEvaluationVersion((value) => value + 1)
+=======
+>>>>>>> origin/main
       onRefresh()
     }
     window.addEventListener('scenario-facility-preview', onPreview)
@@ -135,6 +209,25 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
   async function addFacility(event: FormEvent) {
     event.preventDefault()
     if (!detail) return
+<<<<<<< HEAD
+    const numericLon = Number(lon)
+    const numericLat = Number(lat)
+    const numericCapacity = Number(capacity)
+    const numericRadius = Number(serviceRadius)
+    if (![numericLon, numericLat, numericCapacity, numericRadius].every(Number.isFinite) || numericCapacity <= 0 || numericRadius <= 0) {
+      setMessage('请先填写有效的经度、纬度、容量和服务半径。')
+      return
+    }
+    // Adding a simulated facility immediately reveals the current-scenario layer.
+    dispatch({ type: 'set-scenario-view', value: 'current' })
+    const payload: FacilityCreate = {
+      type: facilityType,
+      lon: numericLon,
+      lat: numericLat,
+      capacity_value: numericCapacity,
+      capacity_unit: capacityUnits[facilityType].unit,
+      service_radius_km: numericRadius,
+=======
     const payload: FacilityCreate = {
       type: facilityType,
       lon,
@@ -142,6 +235,7 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
       capacity_value: capacity,
       capacity_unit: 'people',
       service_radius_km: serviceRadius,
+>>>>>>> origin/main
       budget_points: null,
     }
     await perform(
@@ -150,15 +244,25 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
     )
   }
 
+<<<<<<< HEAD
+  async function updateFacilityPlacement(facilityId: string, nextLon: number, nextLat: number, nextRadius: number) {
+=======
   async function updatePosition(facilityId: string, nextLon: number, nextLat: number) {
+>>>>>>> origin/main
     if (!detail) return
     await perform(
       () =>
         scenarioApi.updateFacility(detail.id, facilityId, {
           lon: nextLon,
           lat: nextLat,
+<<<<<<< HEAD
+          service_radius_km: nextRadius,
+        }),
+      '设施位置与服务半径已保存',
+=======
         }),
       '设施位置已保存',
+>>>>>>> origin/main
     )
   }
 
@@ -170,9 +274,18 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
       setEvaluation(
         await scenarioApi.evaluate(detail.id, {
           at_risk_population: atRisk,
+<<<<<<< HEAD
+          hazard_threshold: state.hazardThreshold,
+        }),
+      )
+      setLocalEvaluationVersion((value) => value + 1)
+      onRefresh()
+      setMessage('区域指标已重新计算')
+=======
           hazard_threshold: 0.5,
         }),
       )
+>>>>>>> origin/main
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : String(cause))
     } finally {
@@ -180,6 +293,11 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
     }
   }
 
+<<<<<<< HEAD
+  const uniqueScenarios = scenarios.filter((scenario, index, all) => all.findIndex((item) => displayScenarioName(item.name) === displayScenarioName(scenario.name)) === index)
+
+=======
+>>>>>>> origin/main
   return (
     <section className="scenario-panel" aria-labelledby="scenario-title">
       <div className="panel-heading">
@@ -202,9 +320,15 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
           }
         >
           <option value="">未选择</option>
+<<<<<<< HEAD
+          {uniqueScenarios.map((scenario) => (
+            <option key={scenario.id} value={scenario.id}>
+              {displayScenarioName(scenario.name)}
+=======
           {scenarios.map((scenario) => (
             <option key={scenario.id} value={scenario.id}>
               {scenario.name}
+>>>>>>> origin/main
             </option>
           ))}
         </select>
@@ -240,12 +364,25 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
             </button>
           </div>
 
+<<<<<<< HEAD
+          <p className="scenario-parameter-note">演示建议：避难所容量 50,000 人、服务半径 50 km，便于观察方案对高风险区域的局部改善；正式结论请替换为经过核验的设施数据。</p>
+
+=======
+>>>>>>> origin/main
           <form className="facility-form" onSubmit={addFacility}>
             <label>
               类型
               <select
                 value={facilityType}
+<<<<<<< HEAD
+                onChange={(event) => {
+                const nextType = event.target.value as FacilityType
+                setFacilityType(nextType)
+                setCapacity(capacityUnits[nextType].defaultValue)
+              }}
+=======
                 onChange={(event) => setFacilityType(event.target.value as FacilityType)}
+>>>>>>> origin/main
               >
                 {Object.entries(facilityLabels).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -262,7 +399,11 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 min="-180"
                 max="180"
                 value={lon}
+<<<<<<< HEAD
+                onChange={(event) => setLon(event.target.value === '' ? '' : Number(event.target.value))}
+=======
                 onChange={(event) => setLon(Number(event.target.value))}
+>>>>>>> origin/main
               />
             </label>
             <label>
@@ -273,6 +414,19 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 min="-90"
                 max="90"
                 value={lat}
+<<<<<<< HEAD
+                onChange={(event) => setLat(event.target.value === '' ? '' : Number(event.target.value))}
+              />
+            </label>
+            <label>
+              {capacityUnits[facilityType].label}
+              <input
+                type="number"
+                min="1"
+                step={capacityUnits[facilityType].step}
+                value={capacity}
+                onChange={(event) => setCapacity(event.target.value === '' ? '' : Number(event.target.value))}
+=======
                 onChange={(event) => setLat(Number(event.target.value))}
               />
             </label>
@@ -284,6 +438,7 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 step="50"
                 value={capacity}
                 onChange={(event) => setCapacity(Number(event.target.value))}
+>>>>>>> origin/main
               />
             </label>
             <label>
@@ -293,13 +448,21 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 min="0.5"
                 step="0.5"
                 value={serviceRadius}
+<<<<<<< HEAD
+                onChange={(event) => setServiceRadius(event.target.value === '' ? '' : Number(event.target.value))}
+=======
                 onChange={(event) => setServiceRadius(Number(event.target.value))}
+>>>>>>> origin/main
               />
             </label>
             <button disabled={busy} type="submit">
               添加模拟设施
             </button>
           </form>
+<<<<<<< HEAD
+          <p className="facility-drag-hint">提示：切换到“当前方案”后，地图上的设施图标或光圈均可拖动；拖动后会自动保存并重新评估。</p>
+=======
+>>>>>>> origin/main
 
           <div className="facility-list">
             {(detail.facilities ?? []).length === 0 && <p className="empty">尚未添加模拟设施。</p>}
@@ -308,6 +471,31 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                 <div>
                   <strong>{facilityLabels[facility.type]}</strong>
                   <small>
+<<<<<<< HEAD
+                    {facility.capacity_value ?? '—'} {capacityUnitLabels[facility.capacity_unit ?? ''] ?? facility.capacity_unit ?? ''} · 半径 {facility.service_radius_km ?? '—'} km
+                  </small>
+                </div>
+                <div className="coordinate-row">                <label className="facility-field"><span>经度</span><input
+                    aria-label={`${facilityLabels[facility.type]}经度`}
+                    type="number"
+                    step="0.01"
+                    defaultValue={String(facility.lon)}
+                    placeholder="经度"
+                    id={`lon-${facility.id}`} /></label>                <label className="facility-field"><span>纬度</span><input
+                    aria-label={`${facilityLabels[facility.type]}纬度`}
+                    type="number"
+                    step="0.01"
+                    defaultValue={String(facility.lat)}
+                    placeholder="纬度"
+                    id={`lat-${facility.id}`} /></label>                <label className="facility-field"><span>服务半径（km）</span><input
+                    aria-label={`${facilityLabels[facility.type]}服务半径`}
+                    type="number"
+                    min="0.5"
+                    step="0.5"
+                    defaultValue={String(facility.service_radius_km ?? 5)}
+                    placeholder="半径 km"
+                    id={`radius-${facility.id}`} /></label>
+=======
                     {facility.capacity_value ?? '—'} {facility.capacity_unit ?? ''}
                   </small>
                 </div>
@@ -326,6 +514,7 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                     defaultValue={facility.lat}
                     id={`lat-${facility.id}`}
                   />
+>>>>>>> origin/main
                   <button
                     type="button"
                     disabled={busy}
@@ -336,10 +525,20 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
                       const nextLat = Number(
                         (document.getElementById(`lat-${facility.id}`) as HTMLInputElement).value,
                       )
+<<<<<<< HEAD
+                      const nextRadius = Number(
+                        (document.getElementById(`radius-${facility.id}`) as HTMLInputElement).value,
+                      )
+                      void updateFacilityPlacement(facility.id, nextLon, nextLat, nextRadius)
+                    }}
+                  >
+                    保存设置
+=======
                       void updatePosition(facility.id, nextLon, nextLat)
                     }}
                   >
                     保存位置
+>>>>>>> origin/main
                   </button>
                   <button
                     className="danger"
@@ -361,7 +560,11 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
 
           <div className="evaluation-control">
             <label>
+<<<<<<< HEAD
+              备用风险人口（后端回退）
+=======
               风险人口
+>>>>>>> origin/main
               <input
                 type="number"
                 min="1"
@@ -377,6 +580,23 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
       )}
 
       {message && <p className="form-message" role="status">{message}</p>}
+<<<<<<< HEAD
+      {regionalEvaluation ? (
+        <div className="evaluation-result">
+          <div><span>{facilityLabels[state.selectedFacilityType]}设施·高风险人口</span><strong>{regionalEvaluation.current.highRiskPopulation.toLocaleString('zh-CN')}</strong></div>
+          <div><span>方案已覆盖</span><strong>{regionalEvaluation.current.covered.toLocaleString('zh-CN')}</strong></div>
+          <div><span>方案未覆盖</span><strong>{regionalEvaluation.current.uncovered.toLocaleString('zh-CN')}</strong></div>
+          <div><span>方案覆盖率</span><strong>{(regionalEvaluation.current.coverageRatio * 100).toFixed(1)}%</strong></div>
+          <p>已统一使用区域分析口径：行政区质心、服务半径与容量分配。人口代理和方法限制见“数据可信度”。</p>
+        </div>
+      ) : evaluation && (
+        <div className="evaluation-result">
+          <div><span>简化模型覆盖人口</span><strong>{evaluation.modeled_covered_population}</strong></div>
+          <div><span>简化模型未覆盖</span><strong>{evaluation.modeled_uncovered_population}</strong></div>
+          <div><span>简化模型覆盖率</span><strong>{(evaluation.modeled_coverage_ratio * 100).toFixed(1)}%</strong></div>
+          <div><span>预算点</span><strong>{evaluation.total_budget_points}</strong></div>
+          <p>区域数据暂不可用，当前为后端容量总和回退结果，不代表空间覆盖。</p>
+=======
       {evaluation && (
         <div className="evaluation-result">
           <div><span>覆盖人口</span><strong>{evaluation.modeled_covered_population}</strong></div>
@@ -384,6 +604,7 @@ export default function ScenarioPanel({ scenarios, onRefresh }: Props) {
           <div><span>覆盖率</span><strong>{(evaluation.modeled_coverage_ratio * 100).toFixed(1)}%</strong></div>
           <div><span>预算点</span><strong>{evaluation.total_budget_points}</strong></div>
           <p>{evaluation.assumptions[0]}</p>
+>>>>>>> origin/main
         </div>
       )}
     </section>

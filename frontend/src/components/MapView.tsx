@@ -4,7 +4,11 @@ import type { Feature, FeatureCollection, LineString, Point, Polygon } from 'geo
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { ApiError, dataApi, scenarioApi } from '../api'
 import { useAppDispatch, useAppState, type ImpactMetric } from '../state/AppState'
+<<<<<<< HEAD
+import type { StormSummary, TrackPoint, TrajectoryMatchRequest, TrajectoryMatchResponse, WindManifest } from '../types/contracts'
+=======
 import type { StormSummary, TrackPoint, TrajectoryMatchRequest, WindManifest } from '../types/contracts'
+>>>>>>> origin/main
 import WindOverlay from './WindOverlay'
 
 interface Props {
@@ -519,6 +523,10 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
   const [reportedDamageAvailable, setReportedDamageAvailable] = useState(false)
   const [drawMatchMode, setDrawMatchMode] = useState<TrajectoryMatchRequest['mode']>('geographic')
   const [drawPoints, setDrawPoints] = useState<{ lon: number; lat: number }[]>([])
+<<<<<<< HEAD
+  const [drawResult, setDrawResult] = useState<TrajectoryMatchResponse | null>(null)
+=======
+>>>>>>> origin/main
   const [drawMatching, setDrawMatching] = useState(false)
   const drawingRef = useRef(false)
   const drawnPointsRef = useRef<{ lon: number; lat: number }[]>([])
@@ -680,12 +688,22 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         }))
       }).catch(() => undefined)
     }
+<<<<<<< HEAD
+    // Both the icon and its halo are draggable, including medical and rescue facilities.
     map.on('mousedown', 'scenario-facilities', onFacilityDown)
+    map.on('mousedown', 'scenario-facility-halo', onFacilityDown)
+=======
+    map.on('mousedown', 'scenario-facilities', onFacilityDown)
+>>>>>>> origin/main
     map.on('mousemove', onFacilityMove)
     map.on('mouseup', onFacilityUp)
     mapRef.current = map
     return () => {
       map.off('mousedown', 'scenario-facilities', onFacilityDown)
+<<<<<<< HEAD
+      map.off('mousedown', 'scenario-facility-halo', onFacilityDown)
+=======
+>>>>>>> origin/main
       map.off('mousemove', onFacilityMove)
       map.off('mouseup', onFacilityUp)
       map.remove()
@@ -699,7 +717,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     setSourceData(map, 'drawn-trajectory', EMPTY)
     drawnPointsRef.current = []
     setDrawPoints([])
+<<<<<<< HEAD
+    setDrawResult(null)
+=======
     dispatch({ type: 'set-trajectory-match', value: null })
+>>>>>>> origin/main
     if (!drawMode) return
 
     map.easeTo({ center: [120, 18], zoom: 1.2, duration: 500 })
@@ -712,7 +734,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
       lastPoint = null
       drawnPointsRef.current = []
       setDrawPoints([])
+<<<<<<< HEAD
+      setDrawResult(null)
+=======
       dispatch({ type: 'set-trajectory-match-status', status: 'loading' })
+>>>>>>> origin/main
       event.preventDefault()
     }
     const onMove = (event: maplibregl.MapMouseEvent) => {
@@ -743,6 +769,15 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         points: drawnPointsRef.current,
         top_k: 5,
         filters: {
+<<<<<<< HEAD
+          basins: state.filters.basins as NonNullable<TrajectoryMatchRequest['filters']>['basins'],
+          season_from: state.filters.seasonRange[0],
+          season_to: state.filters.seasonRange[1],
+        },
+      }, undefined)
+        .then((response) => setDrawResult(response))
+        .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : String(cause)))
+=======
           basins: (state.selectedBasin ? [state.selectedBasin] : []) as NonNullable<TrajectoryMatchRequest['filters']>['basins'],
           season_from: state.selectedYearRange[0],
           season_to: state.selectedYearRange[1],
@@ -756,6 +791,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
           setError(message)
           dispatch({ type: 'set-trajectory-match-status', status: 'error', error: message })
         })
+>>>>>>> origin/main
         .finally(() => setDrawMatching(false))
     }
     map.on('mousedown', onDown)
@@ -769,7 +805,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
       map.off('mousemove', onMove)
       map.off('mouseup', onUp)
     }
+<<<<<<< HEAD
+  }, [drawMatchMode, drawMode, mapReady])
+=======
   }, [dispatch, drawMatchMode, drawMode, mapReady, state.selectedBasin, state.selectedYearRange])
+>>>>>>> origin/main
 
   useEffect(() => {
     if (!mapReady) return
@@ -804,6 +844,25 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
       .then(([zones, facilities, scenario]) => {
         setSourceData(mapRef.current, 'taiwan-zones', zones as unknown as FeatureCollection)
         setSourceData(mapRef.current, 'taiwan-facilities', facilities as unknown as FeatureCollection)
+<<<<<<< HEAD
+        const simulated = state.scenarioView === 'current'
+          ? (scenario?.facilities ?? []).map((facility) => ({
+            type: 'Feature' as const,
+            id: facility.id,
+            properties: {
+              facility_id: facility.id,
+              type: facility.type,
+              lon: facility.lon,
+              lat: facility.lat,
+              capacity_value: facility.capacity_value,
+              capacity_unit: facility.capacity_unit,
+              service_radius_km: facility.service_radius_km,
+              is_simulated: true,
+            },
+            geometry: { type: 'Point' as const, coordinates: [facility.lon, facility.lat] as [number, number] },
+          }))
+          : []
+=======
         const simulated = (scenario?.facilities ?? []).map((facility) => ({
           type: 'Feature' as const,
           id: facility.id,
@@ -819,10 +878,24 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
           },
           geometry: { type: 'Point' as const, coordinates: [facility.lon, facility.lat] as [number, number] },
         }))
+>>>>>>> origin/main
         scenarioFeaturesRef.current = simulated
         setSourceData(mapRef.current, 'scenario-facilities', { type: 'FeatureCollection', features: simulated })
         setSourceData(mapRef.current, 'scenario-facility-areas', {
           type: 'FeatureCollection',
+<<<<<<< HEAD
+          features: state.scenarioView === 'current'
+            ? (scenario?.facilities ?? [])
+              .filter((facility) => facility.service_radius_km != null && facility.service_radius_km > 0)
+              .map((facility) => ({
+                ...circlePolygon(facility.lon, facility.lat, facility.service_radius_km ?? 0),
+                properties: { facility_id: facility.id, type: facility.type, radius_km: facility.service_radius_km },
+              }))
+            : [],
+        })
+        setFacilityCount(facilities.features.length + simulated.length)
+        setStatus(`台湾 22 区 · ${state.scenarioView === 'baseline' ? '历史基线' : '当前方案'} · ${(facilities.features.length + simulated.length).toLocaleString()} 设施${simulated.length ? ` · 新增 ${simulated.length}` : ''}`)
+=======
           features: (scenario?.facilities ?? [])
             .filter((facility) => facility.service_radius_km != null && facility.service_radius_km > 0)
             .map((facility) => ({
@@ -832,6 +905,7 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         })
         setFacilityCount(facilities.features.length + simulated.length)
         setStatus(`台湾 22 区 · ${(facilities.features.length + simulated.length).toLocaleString()} 设施${simulated.length ? ` · 新增 ${simulated.length}` : ''}`)
+>>>>>>> origin/main
       })
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === 'AbortError') return
@@ -839,7 +913,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         setStatus('台湾图层不可用')
       })
     return () => controller.abort()
+<<<<<<< HEAD
+  }, [mapReady, scenarioVersion, state.mode, state.selectedScenarioId, state.scenarioView])
+=======
   }, [mapReady, scenarioVersion, state.mode, state.selectedScenarioId])
+>>>>>>> origin/main
 
   useEffect(() => {
     if (!mapReady || !selected?.id || state.mode === 'overview') {
@@ -904,24 +982,40 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     }
     const controller = new AbortController()
     Promise.all([
+<<<<<<< HEAD
+      dataApi.impact({ storm_id: selected.id, metric: state.impactMetric }, controller.signal),
+=======
       dataApi.impact({ storm_id: selected.id, metric: state.selectedImpactMetric }, controller.signal),
+>>>>>>> origin/main
       dataApi.taiwanZones({}, controller.signal),
     ])
       .then(([gridResponse, zonesResponse]) => {
         const grid = gridResponse as unknown as FeatureCollection
         const zones = zonesResponse as unknown as FeatureCollection
+<<<<<<< HEAD
+        const regions = buildImpactRegions(zones, grid, state.impactMetric)
+        setSourceData(mapRef.current, 'impact-regions', regions)
+        const hasMetric = grid.features.some((feature) => feature.properties?.[state.impactMetric] != null)
+=======
         const regions = buildImpactRegions(zones, grid, state.selectedImpactMetric)
         setSourceData(mapRef.current, 'impact-regions', regions)
         const hasMetric = grid.features.some((feature) => feature.properties?.[state.selectedImpactMetric] != null)
+>>>>>>> origin/main
         const hasReportedDamage = grid.features.some((feature) => feature.properties?.reported_damage_usd != null)
         const coloredRegions = regions.features.filter((feature) => feature.properties?.impact_value != null).length
         setReportedDamageAvailable(hasReportedDamage)
         setImpactStatus(
           hasMetric
             ? `${coloredRegions}/${regions.features.length} 行政区 · 中心点采样`
+<<<<<<< HEAD
+            : `${IMPACT_METRICS[state.impactMetric].label}：未提供`,
+        )
+        if (state.impactMetric === 'reported_damage_usd' && !hasReportedDamage) {
+=======
             : `${IMPACT_METRICS[state.selectedImpactMetric].label}：未提供`,
         )
         if (state.selectedImpactMetric === 'reported_damage_usd' && !hasReportedDamage) {
+>>>>>>> origin/main
           dispatch({ type: 'set-impact-metric', value: 'hazard_index' })
         }
       })
@@ -934,7 +1028,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         setImpactStatus('区域影响图层不可用')
       })
     return () => controller.abort()
+<<<<<<< HEAD
+  }, [dispatch, mapReady, selected?.id, selected?.impact_available, state.impactMetric, state.layers.impact.visible])
+=======
   }, [dispatch, mapReady, selected?.id, selected?.impact_available, state.selectedImpactMetric, state.layers.impact.visible])
+>>>>>>> origin/main
 
   useEffect(() => {
     if (!windMode) {
@@ -987,7 +1085,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     if (!mapReady || !map) return
     map.setPaintProperty('track-context', 'line-opacity', state.layers.tracks.visible ? state.layers.tracks.opacity * 0.42 : 0)
     map.setPaintProperty('storm-track', 'line-opacity', state.layers.tracks.visible ? state.layers.tracks.opacity : 0)
+<<<<<<< HEAD
+    map.setPaintProperty('impact-regions-fill', 'fill-color', impactColor(state.impactMetric))
+=======
     map.setPaintProperty('impact-regions-fill', 'fill-color', impactColor(state.selectedImpactMetric))
+>>>>>>> origin/main
     map.setPaintProperty('impact-regions-fill', 'fill-opacity', state.layers.impact.visible ? state.layers.impact.opacity : 0)
     map.setPaintProperty('impact-regions-line', 'line-opacity', state.layers.impact.visible ? 0.42 : 0)
     map.setPaintProperty('global-impact-fill', 'fill-color', impactColor('hazard_index'))
@@ -1003,14 +1105,22 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     map.setPaintProperty('facility-cluster-count', 'text-opacity', state.layers.facilities.opacity)
     map.setLayoutProperty('facility-clusters', 'visibility', state.layers.facilities.visible ? 'visible' : 'none')
     map.setLayoutProperty('facility-cluster-count', 'visibility', state.layers.facilities.visible ? 'visible' : 'none')
+<<<<<<< HEAD
+  }, [mapReady, state.impactMetric, state.layers, state.mode])
+=======
   }, [mapReady, state.selectedImpactMetric, state.layers, state.mode])
+>>>>>>> origin/main
 
   const capability = state.mode === 'overview'
     ? windManifest?.capability ?? '未加载'
     : !selected?.wind_available
       ? 'none'
       : windManifest?.capability ?? '未加载'
+<<<<<<< HEAD
+  const impactDefinition = IMPACT_METRICS[state.impactMetric]
+=======
   const impactDefinition = IMPACT_METRICS[state.selectedImpactMetric]
+>>>>>>> origin/main
   const impactLayerActive = state.layers.impact.visible && (state.mode !== 'overview' && Boolean(selected?.impact_available))
 
   return (
@@ -1070,16 +1180,49 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
               onClick={() => {
                 drawnPointsRef.current = []
                 setDrawPoints([])
+<<<<<<< HEAD
+                setDrawResult(null)
+=======
                 dispatch({ type: 'set-trajectory-match', value: null })
+>>>>>>> origin/main
                 setSourceData(mapRef.current, 'drawn-trajectory', EMPTY)
               }}
             >清除</button>
           </div>
           {drawMatching && <small className="draw-match-status">正在匹配 A7 轨迹特征…</small>}
+<<<<<<< HEAD
+          {drawResult && !drawMatching && (
+            <div className="draw-match-results">
+              <div className="draw-match-result-meta">已匹配 {drawResult.items.length} 个候选 · {drawResult.elapsed_ms.toFixed(1)} ms</div>
+              {drawResult.items.map((item) => {
+                const storm = storms.find((candidate) => candidate.id === item.storm_id)
+                return (
+                  <button
+                    type="button"
+                    className="draw-match-result"
+                    key={item.storm_id}
+                    onClick={() => storm && dispatch({ type: 'select-storm', stormId: storm.id })}
+                  >
+                    <span><b>#{item.rank}</b> {storm?.name ?? item.storm_id}</span>
+                    <strong>{Math.round(item.similarity * 100)}%</strong>
+                    <small>{storm ? `${storm.basin} · ${storm.season} · 形态 ${Math.round(item.frechet_component * 100)} · 方向 ${Math.round(item.direction_component * 100)}` : item.explanation}</small>
+                  </button>
+                )
+              })}
+              {drawResult.items[0] && (
+                <p className="draw-match-story">
+                  叙事线索：这条手绘路径与「{storms.find((storm) => storm.id === drawResult.items[0].storm_id)?.name ?? drawResult.items[0].storm_id}」最接近；
+                  形态相似度 {Math.round(drawResult.items[0].frechet_component * 100)}%，移动方向一致性 {Math.round(drawResult.items[0].direction_component * 100)}%。
+                  点击候选可在右侧查看该事件的时间、风速、气压和完整轨迹。
+                </p>
+              )}
+            </div>
+=======
           {state.trajectoryMatch && !drawMatching && (
             <small className="draw-match-status">
               已匹配 {state.trajectoryMatch.items.length} 个候选，完整结果见右侧“相似轨迹”列表。
             </small>
+>>>>>>> origin/main
           )}
         </div>
       )}
@@ -1087,7 +1230,11 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
         <label className="map-metric-control">
           <span>影响指标</span>
           <select
+<<<<<<< HEAD
+            value={state.impactMetric}
+=======
             value={state.selectedImpactMetric}
+>>>>>>> origin/main
             onChange={(event) => dispatch({ type: 'set-impact-metric', value: event.target.value as ImpactMetric })}
           >
             {(Object.entries(IMPACT_METRICS) as [ImpactMetric, (typeof IMPACT_METRICS)[ImpactMetric]][])
@@ -1113,3 +1260,9 @@ export default function MapView({ storms, windMode = false, drawMode = false, sc
     </div>
   )
 }
+<<<<<<< HEAD
+
+
+
+=======
+>>>>>>> origin/main
