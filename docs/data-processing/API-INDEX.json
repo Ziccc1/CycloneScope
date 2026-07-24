@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "data_version": "a8-final-2026.07.19",
+  "contract_version": "2.1",
+  "crs": "EPSG:4326",
+  "contracts": {
+    "unified": "DATA-CONTRACTS-v2.1.md",
+    "handoff": "DATA-PROCESSING-HANDOFF-v2.1.md",
+    "audit": "CONTRACT-AUDIT-v2.1.md",
+    "final_scope": "FINAL-SCOPE-v2.1.md",
+    "data_sources": "data-sources-final.md",
+    "storms_summary": "catalog/storms-summary.json",
+    "pydantic_validation": "pydantic-contract-validation.json",
+    "release_consistency_audit": "release-consistency-audit.json"
+  },
+  "datasets": {
+    "global_tracks": "output/processed/ibtracs-global-since1980/",
+    "wp_tracks": "output/processed/ibtracs-wp-since1980/",
+    "classic_cases": "output/processed/classic/classic-storms.json",
+    "storms_summary_contract": "catalog/storms-summary.json",
+    "trajectory_features_global": "output/processed/features/global-since1980/",
+    "trajectory_features_wp": "output/processed/features/wp-since1980/",
+    "era5_manifests_and_frames": "output/processed/era5/wind/",
+    "era5_capability": "output/processed/era5/qa/era5-capability-matrix.json",
+    "impact_grids": "output/processed/impact/storms/{storm_id}/grid.geojson",
+    "reported_impact": "output/processed/impact/reported/reported-impact.parquet",
+    "tce_dat_exposure": "output/processed/impact/tce-dat/tce-dat-exposure.parquet",
+    "worldpop_exposure": "output/processed/impact/exposure-2025-r2025a/",
+    "taiwan_zones_contract": "output/processed/taiwan/zones.geojson",
+    "taiwan_statistical_zones": "output/processed/taiwan/population/statistical-zones.geojson",
+    "taiwan_official_population": "output/processed/taiwan/population/statistical-zones-population-official.parquet",
+    "taiwan_facilities_contract": "output/processed/taiwan/facilities.geojson",
+    "taiwan_rescue_facilities": "output/processed/taiwan/facilities/rescue-facilities.parquet",
+    "road_nodes": "output/processed/taiwan/roads/nodes.parquet",
+    "road_edges": "output/processed/taiwan/roads/edges.parquet",
+    "facility_service_area": "output/processed/taiwan/roads/facility-service-area.parquet"
+  },
+  "qa": {
+    "frozen_contract": "output/qa/frozen-contract-2.1-validation.json",
+    "pydantic_contract": "output/qa/pydantic-contract-validation.json"
+  },
+  "delivery_rules": {
+    "backend_schema_source": "backend/app/schemas/",
+    "frontend_consumption": "API_or_contract_geojson_manifest_frame_only",
+    "raw_data_policy": "raw CSV/NetCDF/GeoTIFF/PBF and large Parquet are not committed",
+    "impact_coverage": "5/16 classic cases; unavailable cases return impact_available=false",
+    "era5_capability": "8 dynamic, 4 static, 4 none",
+    "scope_policy": "FINAL-SCOPE-v2.1.md"
+  }
+}

@@ -6,6 +6,8 @@ def test_health_and_data_sources(client):
     assert health.status_code == 200
     assert health.json()["status"] == "ok"
     assert health.json()["database"] == "sqlite"
+    assert health.json()["data_mode"] == "fixture"
+    assert health.json()["data_status"] == "synthetic_fixture"
 
     sources = client.get("/api/data-sources")
     assert sources.status_code == 200
@@ -102,3 +104,148 @@ def test_facility_rejects_mismatched_capacity_unit(client):
         },
     )
     assert response.status_code == 422
+
+
+def test_extended_storm_filters_and_track_window(client):
+    response = client.get(
+        "/api/storms",
+        params={
+            "season_from": 2009,
+            "season_to": 2013,
+            "min_wind_ms": 80,
+            "landfall": "true",
+        },
+    )
+    assert response.status_code == 200
+    assert [item["name"] for item in response.json()["items"]] == ["HAIYAN"]
+
+    invalid_range = client.get(
+        "/api/storms", params={"season_from": 2020, "season_to": 2000}
+    )
+    assert invalid_range.status_code == 422
+
+    track = client.get(
+        "/api/storms/demo-morakot-2009/track",
+        params={
+            "start": "2009-08-06T00:00:00Z",
+            "end": "2009-08-07T12:00:00Z",
+        },
+    )
+    assert track.status_code == 200
+    assert len(track.json()["points"]) == 1
+
+
+def test_impact_taiwan_and_period_fixture_queries(client):
+    impact = client.get(
+        "/api/impact/grid",
+        params={"hazard_threshold": 0.8, "bbox": "120,22,121,23"},
+    )
+    assert impact.status_code == 200
+    assert len(impact.json()["features"]) == 2
+    assert all(
+        item["properties"]["data_status"] == "synthetic_fixture"
+        for item in impact.json()["features"]
+    )
+
+    zones = client.get("/api/taiwan/zones", params={"county_code": "HUA"})
+    assert zones.status_code == 200
+    assert len(zones.json()["features"]) == 1
+
+    facilities = client.get(
+        "/api/taiwan/facilities",
+        params={"type": "medical", "county_code": "KHH"},
+    )
+    assert facilities.status_code == 200
+    assert len(facilities.json()["features"]) == 1
+    assert (
+        client.get("/api/taiwan/facilities", params={"type": "airport"}).status_code
+        == 422
+    )
+
+    period = client.get("/api/wind/periods/demo-global/manifest")
+    assert period.status_code == 200
+    assert period.json()["mode"] == "global"
+    assert client.get("/api/wind/periods/missing/manifest").status_code == 404
+
+
+def test_fixture_trajectory_wrapper_validates_and_filters(client):
+    response = client.post(
+        "/api/trajectory-match",
+        json={
+            "mode": "shape",
+            "points": [{"lon": 130, "lat": 15}, {"lon": 122, "lat": 23}],
+            "filters": {"basins": ["WP"], "season_from": 2000, "season_to": 2020},
+            "top_k": 1,
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data_status"] == "algorithmic_result"
+    assert len(body["items"]) == 1
+    assert body["items"][0]["rank"] == 1
+    assert "Fixture" in body["items"][0]["explanation"]
+
+    invalid = client.post(
+        "/api/trajectory-match",
+        json={
+            "mode": "geographic",
+            "points": [{"lon": 120, "lat": 20}],
+        },
+    )
+    assert invalid.status_code == 422
+
+
+def test_full_scenario_and_facility_crud(client):
+    created = client.post("/api/scenarios", json={"name": "CRUD scenario"})
+    scenario_id = created.json()["id"]
+    facility = client.post(
+        f"/api/scenarios/{scenario_id}/facilities",
+        json={"type": "shelter", "lon": 121.5, "lat": 24.0},
+    )
+    facility_id = facility.json()["id"]
+
+    detail = client.get(f"/api/scenarios/{scenario_id}")
+    assert detail.status_code == 200
+    assert len(detail.json()["facilities"]) == 1
+
+    renamed = client.patch(
+        f"/api/scenarios/{scenario_id}", json={"name": "Renamed scenario"}
+    )
+    assert renamed.status_code == 200
+    assert renamed.json()["name"] == "Renamed scenario"
+
+    moved = client.patch(
+        f"/api/scenarios/{scenario_id}/facilities/{facility_id}",
+        json={"lon": 121.7, "lat": 24.2},
+    )
+    assert moved.status_code == 200
+    assert moved.json()["lon"] == 121.7
+
+    changed_type = client.patch(
+        f"/api/scenarios/{scenario_id}/facilities/{facility_id}",
+        json={"type": "medical"},
+    )
+    assert changed_type.status_code == 200
+    assert changed_type.json()["capacity_unit"] == "beds"
+    assert changed_type.json()["capacity_value"] == 50
+
+    assert (
+        client.patch(
+            f"/api/scenarios/{scenario_id}/facilities/{facility_id}", json={}
+        ).status_code
+        == 422
+    )
+    assert (
+        client.delete(
+            f"/api/scenarios/not-this-scenario/facilities/{facility_id}"
+        ).status_code
+        == 404
+    )
+    assert (
+        client.delete(
+            f"/api/scenarios/{scenario_id}/facilities/{facility_id}"
+        ).status_code
+        == 204
+    )
+    assert client.delete(f"/api/scenarios/{scenario_id}").status_code == 204
+    assert client.get(f"/api/scenarios/{scenario_id}").status_code == 404

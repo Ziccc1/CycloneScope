@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "data_version": "a8-final-2026.07.19",
+  "generated_at": "2026-07-20T00:00:00Z",
+  "status": "pass_with_known_coverage_limits",
+  "contract_version": "2.1",
+  "primary_population": "WorldPop Global2 R2025A 2025 scenario",
+  "official_population_reference_date": "2024-12-01",
+  "primary_tracks": "IBTrACS since1980 global plus WP subset",
+  "classic_cases": 16,
+  "era5_capability": {"dynamic": 8, "static": 4, "none": 4},
+  "impact_grid_coverage": "5/16 classic cases",
+  "qa": ["frozen-contract-2.1-validation.json", "pydantic-contract-validation.json"]
+}

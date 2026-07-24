@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "data_version": "a8-final-2026.07.19",
+  "status": "pass",
+  "checks": [
+    {
+      "name": "api.no_legacy_handoff",
+      "status": "pass",
+      "detail": "no v1 path in API index"
+    },
+    {
+      "name": "api.current_contract",
+      "status": "pass",
+      "detail": "2.1"
+    },
+    {
+      "name": "catalog.count",
+      "status": "pass",
+      "detail": "4943"
+    },
+    {
+      "name": "sources.rescue",
+      "status": "pass",
+      "detail": "['era5_single_levels', 'ibtracs_since1980', 'ibtracs_wp', 'tw_emergency_centers_5969', 'tw_medical', 'tw_rescue_units_5969', 'tw_shelter_status_12849', 'tw_shelters', 'tw_zones', 'worldpop_taiwan_100m', 'worldpop_taiwan_2020', 'worldpop_taiwan_2020_r2025a', 'worldpop_taiwan_2025_r2025a', 'worldpop_twn']"
+    },
+    {
+      "name": "sources.status_rescue",
+      "status": "pass",
+      "detail": "rescue is integrated"
+    },
+    {
+      "name": "sources.status_optional",
+      "status": "pass",
+      "detail": "shelter status remains optional"
+    },
+    {
+      "name": "handoff.16 场",
+      "status": "pass",
+      "detail": "16 场"
+    },
+    {
+      "name": "handoff.13 个契约 manifest",
+      "status": "pass",
+      "detail": "13 个契约 manifest"
+    },
+    {
+      "name": "handoff.665 个压缩 frame",
+      "status": "pass",
+      "detail": "665 个压缩 frame"
+    },
+    {
+      "name": "handoff.8 场动态",
+      "status": "pass",
+      "detail": "8 场动态"
+    },
+    {
+      "name": "handoff.4 场静态",
+      "status": "pass",
+      "detail": "4 场静态"
+    },
+    {
+      "name": "handoff.4 场无风场",
+      "status": "pass",
+      "detail": "4 场无风场"
+    },
+    {
+      "name": "handoff.5 场台湾事件格网",
+      "status": "pass",
+      "detail": "5 场台湾事件格网"
+    },
+    {
+      "name": "handoff.787 救援/应变",
+      "status": "pass",
+      "detail": "787 救援/应变"
+    },
+    {
+      "name": "qa.frozen",
+      "status": "pass",
+      "detail": "passed=25 failed=0"
+    },
+    {
+      "name": "qa.pydantic",
+      "status": "pass",
+      "detail": "{'manifests': 13, 'frames': 665, 'impact_grids': 5}"
+    },
+    {
+      "name": "data.global_track_points",
+      "status": "pass",
+      "detail": "300007"
+    },
+    {
+      "name": "data.wp_track_points",
+      "status": "pass",
+      "detail": "104304"
+    },
+    {
+      "name": "docs.qa_single_entry",
+      "status": "pass",
+      "detail": "['README.md']"
+    }
+  ]
+}

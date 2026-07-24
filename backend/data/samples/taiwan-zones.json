@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "data_status": "synthetic_fixture",
+  "source_ids": [],
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","id":"fixture-zone-tpe","geometry":{"type":"Polygon","coordinates":[[[121.45,24.95],[121.65,24.95],[121.65,25.15],[121.45,25.15],[121.45,24.95]]]},"properties":{"zone_id":"fixture-zone-tpe","county_code":"TPE","town_code":null,"name_zh":"台北联调区","population":250000,"population_year":2026,"area_km2":120.0,"centroid_lon":121.55,"centroid_lat":25.05,"source_ids":[],"data_status":"synthetic_fixture"}},
+    {"type":"Feature","id":"fixture-zone-hua","geometry":{"type":"Polygon","coordinates":[[[121.45,23.85],[121.75,23.85],[121.75,24.15],[121.45,24.15],[121.45,23.85]]]},"properties":{"zone_id":"fixture-zone-hua","county_code":"HUA","town_code":null,"name_zh":"花莲联调区","population":90000,"population_year":2026,"area_km2":420.0,"centroid_lon":121.60,"centroid_lat":24.00,"source_ids":[],"data_status":"synthetic_fixture"}},
+    {"type":"Feature","id":"fixture-zone-khh","geometry":{"type":"Polygon","coordinates":[[[120.15,22.50],[120.45,22.50],[120.45,22.80],[120.15,22.80],[120.15,22.50]]]},"properties":{"zone_id":"fixture-zone-khh","county_code":"KHH","town_code":null,"name_zh":"高雄联调区","population":310000,"population_year":2026,"area_km2":360.0,"centroid_lon":120.30,"centroid_lat":22.65,"source_ids":[],"data_status":"synthetic_fixture"}}
+  ]
+}

@@ -1,3 +1,6 @@
+# v2.1 执行结果覆盖说明
+
+本文是小组初始分工与验收计划。A 工作包的实际完成情况、数量、路径和已知限制以 `docs/data-processing/DATA-PROCESSING-HANDOFF-v2.1.md` 为准；不要将计划中的 3 小时 ERA5 间隔当作实际数据，当前 manifest 为 6 小时。
 # CycloneScope 三人分工、交付与并行开发文档
 
 > 目标：让 A、B、C 在数据尚未全部准备好时仍可并行，实现时不靠口头猜字段。
@@ -203,7 +206,7 @@ backend/data/processed/
 }
 ```
 
-规则：`u.length == v.length == width * height`；数组顺序固定；全球模式建议 1°/6 小时，单场模式 0.5°/3 小时。正式帧以 `.json.gz` 保存，HTTP 对 C 提供普通 JSON 语义，是否由 B 解压或设置内容编码由 B 决定。
+规则：`u.length == v.length == width * height`；数组顺序固定；全球和单场模式的实际时间间隔均以 manifest 为准；当前下载为 6 小时。正式帧以 `.json.gz` 保存，HTTP 对 C 提供普通 JSON 语义，是否由 B 解压或设置内容编码由 B 决定。
 
 **A → B：** manifest、全部帧、每帧 min/max、随机 20 格与 ERA5 对照结果。
 

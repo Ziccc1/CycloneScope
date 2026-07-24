@@ -60,6 +60,8 @@ class TrajectoryMatch(ContractModel):
     rank: int = Field(ge=1)
     similarity: float = Field(ge=0, le=1)
     frechet_component: float = Field(ge=0, le=1)
+    geographic_component: float = Field(ge=0, le=1)
+    shape_component: float = Field(ge=0, le=1)
     direction_component: float = Field(ge=0, le=1)
     explanation: str = Field(min_length=1, max_length=300)
 

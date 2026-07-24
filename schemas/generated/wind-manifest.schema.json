@@ -57,6 +57,14 @@
       "title": "GeoBounds",
       "type": "object"
     },
+    "WindCapability": {
+      "enum": [
+        "dynamic",
+        "static"
+      ],
+      "title": "WindCapability",
+      "type": "string"
+    },
     "WindFrameReference": {
       "additionalProperties": false,
       "properties": {
@@ -118,6 +126,17 @@
   "properties": {
     "bounds": {
       "$ref": "#/$defs/GeoBounds"
+    },
+    "capability": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WindCapability"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "data_status": {
       "$ref": "#/$defs/DataStatus"
