@@ -8,7 +8,7 @@ from .common import ContractModel
 
 
 class DataSource(ContractModel):
-    id: str = Field(min_length=1, max_length=80, pattern=r"^[a-z0-9][a-z0-9-]*$")
+    id: str = Field(min_length=1, max_length=80, pattern=r"^[a-z0-9][a-z0-9_-]*$")
     name: str = Field(min_length=1, max_length=160)
     url: AnyHttpUrl
     purpose: str = Field(min_length=1, max_length=500)

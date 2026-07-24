@@ -15,9 +15,12 @@ from .scenario import (
     EvaluationResponse,
     FacilityCreate,
     FacilityRead,
+    FacilityUpdate,
     FacilityTypeEvaluation,
     ScenarioCreate,
+    ScenarioDetail,
     ScenarioRead,
+    ScenarioUpdate,
 )
 from .sources import DataSource, DataSourceListResponse
 from .storm import (
@@ -34,7 +37,9 @@ from .taiwan import (
     FacilityCollection,
     FacilityFeature,
     FacilityProperties,
+    FacilityServiceAreaResponse,
     FacilityType,
+    ServiceAreaRecord,
     TaiwanZoneCollection,
     TaiwanZoneFeature,
     TaiwanZoneProperties,
@@ -48,7 +53,7 @@ from .trajectory import (
     TrajectoryMatchRequest,
     TrajectoryMatchResponse,
 )
-from .wind import WindFrame, WindFrameReference, WindManifest, WindMode
+from .wind import WindCapability, WindFrame, WindFrameReference, WindManifest, WindMode
 
 __all__ = [
     "AreaGeometry",
@@ -66,6 +71,8 @@ __all__ = [
     "FacilityFeature",
     "FacilityProperties",
     "FacilityRead",
+    "FacilityServiceAreaResponse",
+    "FacilityUpdate",
     "FacilityType",
     "FacilityTypeEvaluation",
     "GeoBounds",
@@ -79,7 +86,10 @@ __all__ = [
     "PointGeometry",
     "PolygonGeometry",
     "ScenarioCreate",
+    "ScenarioDetail",
     "ScenarioRead",
+    "ScenarioUpdate",
+    "ServiceAreaRecord",
     "StormCatalogResponse",
     "StormDetail",
     "StormImpact",
@@ -99,6 +109,7 @@ __all__ = [
     "TrajectoryMatchResponse",
     "WindFrame",
     "WindFrameReference",
+    "WindCapability",
     "WindManifest",
     "WindMode",
 ]

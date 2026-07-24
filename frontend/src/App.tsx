@@ -1,117 +1,139 @@
-import { useEffect, useState } from 'react'
-import { getJson, type StormSummary } from './api'
+import { useCallback, useMemo, useState } from 'react'
+import { buildQuery, getJson, scenarioApi } from './api'
+import AppShell from './components/AppShell'
+import MapView from './components/MapView'
+import { useResource } from './hooks/useResource'
+import {
+  AppStateProvider,
+  useAppDispatch,
+  useAppState,
+} from './state/AppState'
+import type {
+  DataSourceListResponse,
+  HealthResponse,
+  ScenarioRead,
+  StormCatalogResponse,
+} from './types/contracts'
 
-interface HealthResponse {
-  status: string
-  version: string
-  sample_data: boolean
-}
+function Dashboard() {
+  const state = useAppState()
+  const dispatch = useAppDispatch()
+  const [scenarioVersion, setScenarioVersion] = useState(0)
+  const stormUrl = useMemo(
+    () =>
+      buildQuery('/api/storms', {
+        classic: true,
+        basin: state.filters.basins[0],
+        season_from: state.filters.seasonRange[0],
+        season_to: state.filters.seasonRange[1],
+        min_wind_ms: state.filters.minWindMs || undefined,
+      }),
+    [state.filters],
+  )
+  const health = useResource<HealthResponse>(
+    (signal) => getJson('/api/health', signal),
+    [],
+  )
+  const storms = useResource<StormCatalogResponse>(
+    (signal) => getJson(stormUrl, signal),
+    [stormUrl],
+    (value) => value.items.length === 0,
+  )
+  const sources = useResource<DataSourceListResponse>(
+    (signal) => getJson('/api/data-sources', signal),
+    [],
+  )
+  const scenarios = useResource<ScenarioRead[]>(
+    (signal) => scenarioApi.list(signal),
+    [scenarioVersion],
+    (value) => value.length === 0,
+  )
 
-interface StormListResponse {
-  items: StormSummary[]
-}
+  const refreshScenarios = useCallback(
+    () => setScenarioVersion((value) => value + 1),
+    [],
+  )
 
-interface SourceListResponse {
-  count: number
+  async function loadDemoPreset() {
+    const demoStorm = storms.data?.items.find((item) => item.name.toLowerCase() === 'morakot') ?? storms.data?.items[0] ?? null
+    dispatch({ type: 'load-demo-preset', stormId: demoStorm?.id ?? null })
+    let scenario = scenarios.data?.find((item) => item.name === '同预算配置探索')
+    if (!scenario) {
+      const legacy = scenarios.data?.find((item) => item.name === '答辩演示情景' || item.name === '台湾设施联调情景')
+      try {
+        scenario = legacy
+          ? await scenarioApi.update(legacy.id, { name: '同预算配置探索' })
+          : await scenarioApi.create('同预算配置探索')
+        await scenarioApi.addFacility(scenario.id, {
+          type: 'shelter',
+          lon: 121.6,
+          lat: 24,
+          capacity_value: 50000,
+          capacity_unit: 'people',
+          service_radius_km: 50,
+          budget_points: 3,
+        })
+        refreshScenarios()
+      } catch {
+        return
+      }
+    }
+    if (scenario) {
+      try {
+        const detail = await scenarioApi.get(scenario.id)
+        const seed = detail.facilities?.find((facility) =>
+          facility.type === 'shelter'
+          && facility.lon === 121.6
+          && facility.lat === 24
+          && facility.capacity_value === 500
+          && facility.service_radius_km === 5
+        )
+        if (seed) {
+          await scenarioApi.updateFacility(scenario.id, seed.id, {
+            capacity_value: 50000,
+            service_radius_km: 50,
+            budget_points: 5,
+          })
+          refreshScenarios()
+        }
+      } catch {
+        // A stale demo preset should not prevent the rest of the page from loading.
+      }
+    }
+    dispatch({ type: 'set-scenario', scenarioId: scenario.id })
+  }
+
+  const error = [health.error, storms.error, sources.error, scenarios.error]
+    .filter(Boolean)
+    .join('；')
+  const loading = [health.status, storms.status, sources.status].some(
+    (status) => status === 'loading' || status === 'stale',
+  )
+
+  return (
+    <AppShell
+      health={health.data}
+      storms={storms.data?.items ?? []}
+      sources={sources.data}
+      scenarios={scenarios.data ?? []}
+      loading={loading}
+      error={error}
+      slots={{
+        map: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
+        wind: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
+        trajectory: <MapView storms={storms.data?.items ?? []} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
+      }}
+      scenarioVersion={scenarioVersion}
+      onRefreshScenarios={refreshScenarios}
+      onDemoPreset={() => void loadDemoPreset()}
+    />
+  )
 }
 
 export default function App() {
-  const [health, setHealth] = useState('正在连接 API…')
-  const [storms, setStorms] = useState<StormSummary[]>([])
-  const [sourceCount, setSourceCount] = useState(0)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function loadDashboard() {
-      try {
-        const [healthResponse, stormResponse, sourceResponse] = await Promise.all([
-          getJson<HealthResponse>('/api/health', controller.signal),
-          getJson<StormListResponse>('/api/storms?classic=true', controller.signal),
-          getJson<SourceListResponse>('/api/data-sources', controller.signal),
-        ])
-
-        setHealth(`${healthResponse.status} · API ${healthResponse.version}`)
-        setStorms(stormResponse.items)
-        setSourceCount(sourceResponse.count)
-      } catch (cause) {
-        if (cause instanceof DOMException && cause.name === 'AbortError') return
-        setError(cause instanceof Error ? cause.message : String(cause))
-        setHealth('连接失败')
-      }
-    }
-
-    void loadDashboard()
-    return () => controller.abort()
-  }, [])
-
   return (
-    <main>
-      <header>
-        <div>
-          <p className="eyebrow">CYCLONESCOPE · REACT LOCAL INTEGRATION</p>
-          <h1>风迹</h1>
-          <p>高影响热带气旋可视分析系统的第一阶段 API 联调页</p>
-        </div>
-        <span className="status">{health}</span>
-      </header>
-
-      <section className="notice">
-        当前气旋和风场均为测试夹具，不代表真实灾损。正式数据将由预处理流水线替换。
-      </section>
-
-      <section className="metrics" aria-label="本地联调状态">
-        <article>
-          <span>测试案例</span>
-          <strong>{storms.length}</strong>
-        </article>
-        <article>
-          <span>已登记数据来源</span>
-          <strong>{sourceCount}</strong>
-        </article>
-        <article>
-          <span>下一阶段</span>
-          <strong>MapLibre</strong>
-        </article>
-      </section>
-
-      <section>
-        <div className="section-title">
-          <div>
-            <p className="eyebrow">HIGH-IMPACT EVENT LIBRARY</p>
-            <h2>高影响案例接口</h2>
-          </div>
-          <a href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer">
-            打开 Swagger ↗
-          </a>
-        </div>
-
-        {error && <p className="error">{error}</p>}
-        <div className="storm-grid">
-          {storms.map((storm) => (
-            <article key={storm.id} className="storm-card">
-              <span>
-                {storm.basin} · {storm.season}
-              </span>
-              <h3>{storm.name}</h3>
-              <dl>
-                <div>
-                  <dt>测试影响分</dt>
-                  <dd>{storm.impact_score?.toFixed(1) ?? '—'}</dd>
-                </div>
-                <div>
-                  <dt>最大风速</dt>
-                  <dd>
-                    {storm.max_wind_ms == null ? '—' : `${storm.max_wind_ms} m/s`}
-                  </dd>
-                </div>
-              </dl>
-              <small>{storm.data_status}</small>
-            </article>
-          ))}
-        </div>
-      </section>
-    </main>
+    <AppStateProvider>
+      <Dashboard />
+    </AppStateProvider>
   )
 }
