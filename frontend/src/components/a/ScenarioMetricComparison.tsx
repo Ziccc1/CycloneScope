@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Component owner: A
  * Baseline/current scenario metrics with view switching and recoverable reset.
  */
@@ -33,6 +33,17 @@ function changeTone(row: MetricRow) {
   return improved ? 'better' : 'worse'
 }
 
+function formatPercent(value: number | null) {
+  if (value == null) return '—'
+  const percentage = value * 100
+  const digits = percentage !== 0 && Math.abs(percentage) < 0.001
+    ? 5
+    : percentage !== 0 && Math.abs(percentage) < 0.01 ? 3 : 2
+  return percentage.toFixed(digits) + '%'
+}
+const facilityTypeLabels = { shelter: '避难所', medical: '医疗', rescue: '救援' } as const
+const capacityMetricLabels = { shelter: '容量利用率', medical: '医疗床位数', rescue: '救援队伍数' } as const
+const capacityUnitLabels: Record<string, string> = { people: '人', beds: '张', teams: '支', people_day: '人·日' }
 export default function ScenarioMetricComparison({
   analysis,
   scenario,
@@ -51,33 +62,57 @@ export default function ScenarioMetricComparison({
   if (!analysis || status === 'empty') return <div className="a-empty">缺少影响网格，暂时无法比较方案。</div>
   if (!scenario) return <div className="a-empty">请先在上方选择或创建一个情景，再比较基线与方案。</div>
 
+  const facilityTypeLabel = facilityTypeLabels[state.selectedFacilityType]
+  const capacityUnit = capacityUnitLabels[analysis.current.capacityUnit ?? analysis.baseline.capacityUnit ?? ''] ?? ''
+  const capacityRow: MetricRow = analysis.capacityComparable
+    ? {
+        label: capacityMetricLabels[state.selectedFacilityType],
+        baseline: analysis.baseline.capacityUtilization,
+        current: analysis.current.capacityUtilization,
+        format: (value) => value == null ? '不适用' : (value * 100).toFixed(2) + '%',
+      }
+    : {
+        label: capacityMetricLabels[state.selectedFacilityType],
+        baseline: analysis.baseline.capacityValue,
+        current: analysis.current.capacityValue,
+        format: (value) => value == null ? '—' : Math.round(value).toLocaleString('zh-CN') + ' ' + capacityUnit,
+      }
   const rows: MetricRow[] = [
     {
-      label: '覆盖率',
-      baseline: analysis.baseline.coverageRatio,
-      current: analysis.current.coverageRatio,
-      format: (value) => value == null ? '—' : (value * 100).toFixed(2) + '%',
+      label: state.selectedFacilityType === 'shelter' ? '风险加权保障率' : '风险加权可达率',
+      baseline: analysis.baseline.riskWeightedCoverageRatio,
+      current: analysis.current.riskWeightedCoverageRatio,
+      format: formatPercent,
     },
     {
-      label: '未覆盖人口',
+      label: state.selectedFacilityType === 'shelter' ? '容量保障率' : '距离衰减可达率',
+      baseline: analysis.baseline.coverageRatio,
+      current: analysis.current.coverageRatio,
+      format: formatPercent,
+    },
+    {
+      label: state.selectedFacilityType === 'shelter' ? '容量未保障人口' : '未有效纳入服务人口',
       baseline: analysis.baseline.uncovered,
       current: analysis.current.uncovered,
       format: (value) => value == null ? '—' : Math.round(value).toLocaleString('zh-CN') + ' 人',
       lowerIsBetter: true,
     },
+
     {
-      label: '服务盲区数',
+      label: '方案设施圈内高风险人口',
+      baseline: 0,
+      current: analysis.current.scenarioReachablePopulation,
+      format: (value) => value == null ? '—' : Math.round(value).toLocaleString('zh-CN') + ' 人',
+      neutral: true,
+    },
+    {
+      label: '高风险盲区格点',
       baseline: analysis.baseline.blindSpotCount,
       current: analysis.current.blindSpotCount,
       format: (value) => value == null ? '—' : Math.round(value) + ' 个',
       lowerIsBetter: true,
     },
-    {
-      label: '容量利用率',
-      baseline: analysis.baseline.capacityUtilization,
-      current: analysis.current.capacityUtilization,
-      format: (value) => value == null ? '口径不适用' : (value * 100).toFixed(2) + '%',
-    },
+    capacityRow,
     {
       label: '预算点',
       baseline: 0,
@@ -86,7 +121,6 @@ export default function ScenarioMetricComparison({
       neutral: true,
     },
   ]
-
   async function resetBaseline() {
     if (!scenario || !(scenario.facilities?.length ?? 0)) {
       setMessage('当前情景没有模拟设施，无需恢复。')
@@ -135,6 +169,7 @@ export default function ScenarioMetricComparison({
 
   return (
     <div className="scenario-metric-comparison">
+      <p className="scenario-comparison-context">当前比较口径：{facilityTypeLabel}。位置和半径影响“圈内高风险人口”与距离衰减；避难所容量严格守恒，医疗床位和救援队伍不跨单位换算成人口。</p>
       <div className="scenario-comparison-table" role="table" aria-label="基线与方案对比">
         <div className="scenario-table-head" role="row">
           <span>指标</span><span>基线</span><span>当前方案</span><span>变化</span>
@@ -152,19 +187,21 @@ export default function ScenarioMetricComparison({
               <span>{row.format(row.baseline)}</span>
               <span>{row.format(row.current)}</span>
               <span className={changeTone(row)}>
-                {change == null ? '不可比较' : change === 0 ? '无变化' : (change > 0 ? '↑' : '↓') + row.format(Math.abs(change))}
+                {change == null ? (row.baseline == null && row.current == null ? '不适用' : '不可比较') : change === 0 ? '无变化' : (change > 0 ? '↑' : '↓') + row.format(Math.abs(change))}
               </span>
             </div>
           )
         })}
       </div>
-      <div className="scenario-view-switch" role="group" aria-label="地图与排名视图">
-        <span>同步查看：</span>
-        <button type="button" className={state.scenarioView === 'baseline' ? 'active' : ''} onClick={() => dispatch({ type: 'set-scenario-view', value: 'baseline' })}>建设前基线</button>
-        <button type="button" className={state.scenarioView === 'current' ? 'active' : ''} onClick={() => dispatch({ type: 'set-scenario-view', value: 'current' })}>当前方案</button>
+      <div className="scenario-view-switch" role="group" aria-label="地图设施图层与覆盖排名">
+        <span>地图设施图层：</span>
+        <button type="button" className={state.scenarioView === 'baseline' ? 'active' : ''} onClick={() => dispatch({ type: 'set-scenario-view', value: 'baseline' })}>隐藏方案设施</button>
+        <button type="button" className={state.scenarioView === 'current' ? 'active' : ''} onClick={() => dispatch({ type: 'set-scenario-view', value: 'current' })}>显示方案设施</button>
+        <small>危险度底图保持不变；切换只影响模拟设施、服务圈和覆盖排名。</small>
       </div>
+      <p className="scenario-location-note">人口已细分到约 0.025°（约 2.5 km）需求格点。风险加权率、方案设施圈内人口和格点盲区会随选址与半径变化；若新增容量落在已充分保障区，容量保障人口仍可能不增加。</p>
       {!(scenario?.facilities?.length ?? 0) && <p className="a-empty compact">当前情景没有模拟设施，方案与基线相同。</p>}
-      {(scenario?.facilities?.length ?? 0) > 0 && analysis.current.uncovered === analysis.baseline.uncovered && <p className="a-empty compact">方案设施已保存，但服务半径尚未覆盖高风险行政区质心，因此当前指标与基线相同。</p>}
+      {(scenario?.facilities?.length ?? 0) > 0 && analysis.current.scenarioReachablePopulation === 0 && <p className="a-empty compact">方案设施已保存，但服务圈内没有达到当前阈值的需求格点；请移动位置、调整半径或检查危险度阈值。</p>}
       <div className="reset-baseline">
         {!confirming ? (
           <button type="button" disabled={busy || !(scenario?.facilities?.length ?? 0)} onClick={() => setConfirming(true)}>

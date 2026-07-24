@@ -36,7 +36,7 @@ export default function CoverageGapTable({ analysis }: Props) {
       <div className="gap-table-context">
         <span>{view === 'baseline' ? '历史基线' : '当前方案'}</span>
         <span>人口参考年：{analysis.populationYear ?? '未知'}</span>
-        <span>方法：质心 + 服务半径估计</span>
+        <span>方法：约 2.5 km 需求格点 + 距离衰减</span>
       </div>
       <div className="gap-table-sort" role="group" aria-label="缺口表排序">
         <span>排序：</span>
@@ -64,7 +64,7 @@ export default function CoverageGapTable({ analysis }: Props) {
           </tbody>
         </table>
       </div>
-      <p className="a-method-note">缺测行政区不参与排序；暴露人口若来自行政区人口代理，会在数据可信度说明中标注。</p>
+      <p className="a-method-note">行政区值由内部需求格点汇总；影响网格缺少人口时，按行政区总人口均匀分配，具体限制见“数据可信度”。</p>
     </div>
   )
 }

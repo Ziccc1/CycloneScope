@@ -94,7 +94,7 @@ export default function ScenarioDataContext({ storm, sources, health, analysis }
             <span className="context-kind">方案层 · 设施数据</span>
             <strong>{facilitySources?.map((source) => source.name).join('、') || '设施来源未登记'}</strong>
             <p>真实设施构成基线，当前情景中的模拟设施叠加为方案。</p>
-            <small>覆盖由服务半径与容量口径推导，不等同于真实疏散路径。</small>
+            <small>可达性由细网格、球面距离、距离衰减与容量口径推导；缺少道路封闭数据，不等同于真实疏散路径。</small>
           </article>
         </div>
       )}

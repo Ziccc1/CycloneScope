@@ -86,7 +86,7 @@ def test_facility_type_defaults_are_applied_by_contract(client):
     body = facility.json()
     assert body["capacity_value"] == 50
     assert body["capacity_unit"] == "beds"
-    assert body["service_radius_km"] == 15
+    assert body["service_radius_km"] == 10
     assert body["budget_points"] == 5
 
 

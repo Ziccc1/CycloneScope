@@ -54,11 +54,8 @@ class FixtureTrajectoryMatcher:
                     "rank": index,
                     "similarity": component,
                     "frechet_component": component,
-<<<<<<< HEAD
-=======
                     "geographic_component": component,
                     "shape_component": component,
->>>>>>> origin/main
                     "direction_component": component,
                     "explanation": "Fixture ranking for API/UI integration; C algorithm not connected.",
                 }
@@ -145,24 +142,6 @@ class ProcessedTrajectoryMatcher:
             left = query_shape if payload.mode.value == "shape" else query_geo
             right = candidate_shape if payload.mode.value == "shape" else candidate_geo
             prefilter = sum(self._distance(a, b) for a, b in zip(left, right)) / 64
-<<<<<<< HEAD
-            prepared.append((prefilter, storm_id, storm, candidate_geo, right))
-
-        shortlist = sorted(prepared, key=lambda item: item[0])[: max(40, payload.top_k * 8)]
-        ranked = []
-        for _, storm_id, storm, candidate_geo, comparison in shortlist:
-            query = query_shape if payload.mode.value == "shape" else query_geo
-            distance = self._frechet(query, comparison)
-            scale = 2.5 if payload.mode.value == "shape" else 0.08
-            frechet_component = math.exp(-scale * distance)
-            direction_component = self._direction_component(query_geo, candidate_geo)
-            similarity = 0.6 * frechet_component + 0.4 * direction_component
-            ranked.append((similarity, storm_id, storm, frechet_component, direction_component))
-
-        ranked.sort(reverse=True, key=lambda item: item[0])
-        items = []
-        for index, (similarity, storm_id, storm, frechet, direction) in enumerate(
-=======
             prepared.append(
                 (prefilter, storm_id, storm, candidate_geo, candidate_shape)
             )
@@ -204,7 +183,6 @@ class ProcessedTrajectoryMatcher:
             shape,
             direction,
         ) in enumerate(
->>>>>>> origin/main
             ranked[: payload.top_k], start=1
         ):
             items.append(
@@ -213,11 +191,8 @@ class ProcessedTrajectoryMatcher:
                     "rank": index,
                     "similarity": round(similarity, 4),
                     "frechet_component": round(frechet, 4),
-<<<<<<< HEAD
-=======
                     "geographic_component": round(geographic, 4),
                     "shape_component": round(shape, 4),
->>>>>>> origin/main
                     "direction_component": round(direction, 4),
                     "explanation": f"A7 64点特征匹配：{storm['name']}（{storm['season']}，{storm['basin']}）。",
                 }
