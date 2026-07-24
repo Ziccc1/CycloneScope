@@ -11,9 +11,9 @@ from .taiwan import CapacityUnit, EXPECTED_CAPACITY_UNITS, FacilityType
 
 DEFAULT_FACILITY_VALUES: dict[FacilityType, tuple[int, CapacityUnit, float, int]] = {
     FacilityType.SHELTER: (500, CapacityUnit.PEOPLE, 5.0, 3),
-    FacilityType.MEDICAL: (50, CapacityUnit.BEDS, 15.0, 5),
-    FacilityType.RESCUE: (5, CapacityUnit.TEAMS, 20.0, 4),
-    FacilityType.WAREHOUSE: (5000, CapacityUnit.PEOPLE_DAY, 30.0, 4),
+    FacilityType.MEDICAL: (50, CapacityUnit.BEDS, 10.0, 5),
+    FacilityType.RESCUE: (5, CapacityUnit.TEAMS, 10.0, 4),
+    FacilityType.WAREHOUSE: (5000, CapacityUnit.PEOPLE_DAY, 10.0, 4),
 }
 
 

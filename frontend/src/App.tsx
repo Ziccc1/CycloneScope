@@ -19,48 +19,24 @@ function Dashboard() {
   const state = useAppState()
   const dispatch = useAppDispatch()
   const [scenarioVersion, setScenarioVersion] = useState(0)
-<<<<<<< HEAD
   const stormUrl = useMemo(
     () =>
       buildQuery('/api/storms', {
         classic: true,
-        basin: state.filters.basins[0],
-        season_from: state.filters.seasonRange[0],
-        season_to: state.filters.seasonRange[1],
-        min_wind_ms: state.filters.minWindMs || undefined,
+        basin: state.mode === 'taiwan-scenario' ? undefined : state.filters.basins[0],
+        season_from: state.mode === 'taiwan-scenario' ? undefined : state.filters.seasonRange[0],
+        season_to: state.mode === 'taiwan-scenario' ? undefined : state.filters.seasonRange[1],
+        min_wind_ms: state.mode === 'taiwan-scenario' ? undefined : state.filters.minWindMs || undefined,
       }),
-    [state.filters],
-=======
-  const classicStormUrl = useMemo(
-    () =>
-      buildQuery('/api/storms', {
-        classic: true,
-        basin: state.selectedBasin,
-        season_from: state.selectedYearRange[0],
-        season_to: state.selectedYearRange[1],
-        min_wind_ms: state.minWindMs || undefined,
-      }),
-    [state.minWindMs, state.selectedBasin, state.selectedYearRange],
->>>>>>> origin/main
+    [state.filters, state.mode],
   )
   const health = useResource<HealthResponse>(
     (signal) => getJson('/api/health', signal),
     [],
   )
-<<<<<<< HEAD
   const storms = useResource<StormCatalogResponse>(
     (signal) => getJson(stormUrl, signal),
     [stormUrl],
-=======
-  const allStorms = useResource<StormCatalogResponse>(
-    (signal) => getJson('/api/storms', signal),
-    [],
-    (value) => value.items.length === 0,
-  )
-  const classicStorms = useResource<StormCatalogResponse>(
-    (signal) => getJson(classicStormUrl, signal),
-    [classicStormUrl],
->>>>>>> origin/main
     (value) => value.items.length === 0,
   )
   const sources = useResource<DataSourceListResponse>(
@@ -79,65 +55,86 @@ function Dashboard() {
   )
 
   async function loadDemoPreset() {
-<<<<<<< HEAD
     const demoStorm = storms.data?.items.find((item) => item.name.toLowerCase() === 'morakot') ?? storms.data?.items[0] ?? null
+    const demoFacility = {
+      type: 'shelter' as const,
+      lon: 120.3267,
+      lat: 23.1503,
+      capacity_value: 500,
+      capacity_unit: 'people' as const,
+      service_radius_km: 5,
+      budget_points: 3,
+    }
+    const priorityFacility = {
+      ...demoFacility,
+      capacity_value: 5000,
+      service_radius_km: 10,
+      budget_points: 5,
+    }
     dispatch({ type: 'load-demo-preset', stormId: demoStorm?.id ?? null })
-    let scenario = scenarios.data?.find((item) => item.name === '同预算配置探索')
-    if (!scenario) {
-      const legacy = scenarios.data?.find((item) => item.name === '答辩演示情景' || item.name === '台湾设施联调情景')
-      try {
-        scenario = legacy
-          ? await scenarioApi.update(legacy.id, { name: '同预算配置探索' })
-          : await scenarioApi.create('同预算配置探索')
-=======
-    dispatch({ type: 'load-demo-preset' })
-    let scenario = scenarios.data?.find((item) => item.name === '答辩演示情景')
+    let scenario = scenarios.data?.find((item) =>
+      item.name === '同预算配置探索' || item.name === '台湾设施联调情景'
+    )
     if (!scenario) {
       try {
-        scenario = await scenarioApi.create('答辩演示情景')
->>>>>>> origin/main
-        await scenarioApi.addFacility(scenario.id, {
-          type: 'shelter',
-          lon: 121.6,
-          lat: 24,
-<<<<<<< HEAD
-          capacity_value: 50000,
-          capacity_unit: 'people',
-          service_radius_km: 50,
-=======
-          capacity_value: 500,
-          capacity_unit: 'people',
-          service_radius_km: 5,
->>>>>>> origin/main
-          budget_points: 3,
-        })
+        scenario = await scenarioApi.create('同预算配置探索')
+        await scenarioApi.addFacility(scenario.id, demoFacility)
         refreshScenarios()
       } catch {
         return
       }
     }
-<<<<<<< HEAD
     if (scenario) {
       try {
         const detail = await scenarioApi.get(scenario.id)
-        const seed = detail.facilities?.find((facility) =>
-          facility.type === 'shelter'
-          && facility.lon === 121.6
-          && facility.lat === 24
-          && facility.capacity_value === 500
-          && facility.service_radius_km === 5
-        )
+        const shelters = detail.facilities?.filter((facility) => facility.type === 'shelter') ?? []
+        const seed = shelters.find((facility) =>
+          (facility.lon === demoFacility.lon && facility.lat === demoFacility.lat)
+          || (facility.lon === 120.3 && facility.lat === 22.65)
+          || (facility.lon === 121.6 && facility.lat === 24)
+        ) ?? (shelters.length === 1 ? shelters[0] : undefined)
         if (seed) {
-          await scenarioApi.updateFacility(scenario.id, seed.id, {
-            capacity_value: 50000,
-            service_radius_km: 50,
-            budget_points: 5,
-          })
+          if (seed.lon !== demoFacility.lon
+            || seed.lat !== demoFacility.lat
+            || seed.capacity_value !== demoFacility.capacity_value
+            || seed.service_radius_km !== demoFacility.service_radius_km
+            || seed.budget_points !== demoFacility.budget_points) {
+            await scenarioApi.updateFacility(scenario.id, seed.id, demoFacility)
+            refreshScenarios()
+          }
+        } else {
+          await scenarioApi.addFacility(scenario.id, demoFacility)
           refreshScenarios()
         }
       } catch {
         // A stale demo preset should not prevent the rest of the page from loading.
       }
+    }
+    let priorityScenario = scenarios.data?.find((item) =>
+      item.name === '答辩演示情景' || item.name === '高风险优先配置'
+    )
+    try {
+      if (!priorityScenario) {
+        priorityScenario = await scenarioApi.create('答辩演示情景')
+        await scenarioApi.addFacility(priorityScenario.id, priorityFacility)
+        refreshScenarios()
+      } else {
+        const priorityDetail = await scenarioApi.get(priorityScenario.id)
+        const priorityShelters = priorityDetail.facilities?.filter((facility) => facility.type === 'shelter') ?? []
+        const legacyPriority = priorityShelters.find((facility) =>
+          (facility.capacity_value ?? 0) >= 50000
+          || (facility.service_radius_km ?? 0) >= 30
+        )
+        if (legacyPriority) {
+          await scenarioApi.updateFacility(priorityScenario.id, legacyPriority.id, priorityFacility)
+          refreshScenarios()
+        } else if (priorityShelters.length === 0) {
+          await scenarioApi.addFacility(priorityScenario.id, priorityFacility)
+          refreshScenarios()
+        }
+      }
+    } catch {
+      // Keep the same-budget preset usable even if the secondary preset cannot be migrated.
     }
     dispatch({ type: 'set-scenario', scenarioId: scenario.id })
   }
@@ -146,52 +143,23 @@ function Dashboard() {
     .filter(Boolean)
     .join('；')
   const loading = [health.status, storms.status, sources.status].some(
-=======
-    dispatch({ type: 'set-scenario', scenarioId: scenario.id })
-  }
-
-  const filteredMapStorms = useMemo(() => (allStorms.data?.items ?? []).filter((storm) =>
-    storm.season >= state.selectedYearRange[0]
-    && storm.season <= state.selectedYearRange[1]
-    && (!state.selectedBasin || storm.basin === state.selectedBasin)
-    && (storm.max_wind_ms == null || storm.max_wind_ms >= state.minWindMs)), [allStorms.data, state.minWindMs, state.selectedBasin, state.selectedYearRange])
-
-  const error = [health.error, allStorms.error, classicStorms.error, sources.error, scenarios.error]
-    .filter(Boolean)
-    .join('；')
-  const loading = [health.status, allStorms.status, classicStorms.status, sources.status].some(
->>>>>>> origin/main
     (status) => status === 'loading' || status === 'stale',
   )
 
   return (
     <AppShell
       health={health.data}
-<<<<<<< HEAD
       storms={storms.data?.items ?? []}
-=======
-      storms={classicStorms.data?.items ?? []}
-      allStorms={allStorms.data?.items ?? []}
-      allStormsStatus={allStorms.status}
-      allStormsError={allStorms.error}
->>>>>>> origin/main
       sources={sources.data}
       scenarios={scenarios.data ?? []}
       loading={loading}
       error={error}
       slots={{
-<<<<<<< HEAD
         map: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
         wind: <MapView storms={storms.data?.items ?? []} windMode scenarioVersion={scenarioVersion} />,
         trajectory: <MapView storms={storms.data?.items ?? []} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
       }}
       scenarioVersion={scenarioVersion}
-=======
-        map: <MapView storms={filteredMapStorms} windMode scenarioVersion={scenarioVersion} />,
-        wind: <MapView storms={filteredMapStorms} windMode scenarioVersion={scenarioVersion} />,
-        trajectory: <MapView storms={filteredMapStorms} windMode={false} drawMode scenarioVersion={scenarioVersion} />,
-      }}
->>>>>>> origin/main
       onRefreshScenarios={refreshScenarios}
       onDemoPreset={() => void loadDemoPreset()}
     />

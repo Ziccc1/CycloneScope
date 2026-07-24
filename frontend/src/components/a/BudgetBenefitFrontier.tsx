@@ -9,6 +9,12 @@ const facilityNames: Record<string, string> = {
   warehouse: '物资',
 }
 
+function formatDeltaPoints(value: number) {
+  const digits = value !== 0 && Math.abs(value) < 0.001
+    ? 5
+    : value !== 0 && Math.abs(value) < 0.01 ? 3 : 2
+  return `${value >= 0 ? '+' : ''}${value.toFixed(digits)} 个百分点`
+}
 export default function BudgetBenefitFrontier({
   analysis,
   scenario,
@@ -47,12 +53,12 @@ export default function BudgetBenefitFrontier({
       <div className="budget-cards">
         <div><span>预算消耗</span><strong>{budget} 点</strong></div>
         <div><span>未覆盖人口减少</span><strong>{reduced.toLocaleString('zh-CN')} 人</strong></div>
-        <div><span>覆盖率变化</span><strong>{coverageDeltaPoints >= 0 ? '+' : ''}{coverageDeltaPoints.toFixed(2)} 个百分点</strong></div>
+        <div><span>覆盖率变化</span><strong>{formatDeltaPoints(coverageDeltaPoints)}</strong></div>
         <div><span>每预算点收益</span><strong>{marginal.toFixed(1)} 人/点</strong></div>
       </div>
 
       <div className="frontier-plans">
-        <div className="frontier-plans-heading"><strong>候选方案收益比较</strong><span>同一预算：3 点 · 模拟容量：50,000 人 · 服务半径：50 km</span></div>
+        <div className="frontier-plans-heading"><strong>候选方案收益比较</strong><span>同一预算：3 点 · 模拟容量：500 人 · 服务半径：5 km</span></div>
         {plans.map((plan) => {
           const gain = Math.max(0, analysis.baseline.uncovered - plan.summary.uncovered)
           const delta = (plan.summary.coverageRatio - analysis.baseline.coverageRatio) * 100
@@ -60,7 +66,7 @@ export default function BudgetBenefitFrontier({
             const zone = analysis.zones.find((item) => item.name === plan.targetZone)
             if (zone) dispatch({ type: 'set-zone', zoneId: zone.zoneId })
           }}>
-            <span>{plan.label}</span><strong>{gain.toLocaleString('zh-CN')} 人</strong><small>覆盖率 +{delta.toFixed(2)} 个百分点 · 目标：{plan.targetZone ?? '—'}</small>
+            <span>{plan.label}</span><strong>{gain.toLocaleString('zh-CN')} 人</strong><small>覆盖率 {formatDeltaPoints(delta)} · 目标：{plan.targetZone ?? '—'}</small>
           </button>
         })}
       </div>
@@ -85,11 +91,11 @@ export default function BudgetBenefitFrontier({
             ))}
           </div>
           {reduced === 0 && (
-            <p className="a-empty compact">设施已添加，但没有改善任何高风险行政区缺口。请增大服务半径，或把设施移动到高风险行政区质心附近。</p>
+            <p className="a-empty compact">设施已添加，但服务圈内没有达到阈值的高风险需求格点。可移动设施位置、调整半径，或检查当前危险度阈值。</p>
           )}
         </>
       )}
-      <p className="a-method-note">收益是当前方案相对真实设施基线的差值；“局部改善行政区”用于解释设施影响位置，不代表全局最优选址。</p>
+      <p className="a-method-note">收益是当前方案相对真实设施基线的差值；结果由约 2.5 km 需求格点汇总到行政区，不代表道路条件下的全局最优选址。</p>
     </div>
   )
 }

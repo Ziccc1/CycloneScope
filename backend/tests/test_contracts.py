@@ -122,7 +122,7 @@ def test_facility_defaults_and_units_are_type_safe():
     medical = FacilityCreate(type="medical", lon=121.5, lat=25)
     assert medical.capacity_value == 50
     assert medical.capacity_unit.value == "beds"
-    assert medical.service_radius_km == 15
+    assert medical.service_radius_km == 10
 
     with pytest.raises(ValidationError, match="capacity must use"):
         FacilityCreate.model_validate(

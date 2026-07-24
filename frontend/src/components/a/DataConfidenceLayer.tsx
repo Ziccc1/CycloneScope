@@ -17,6 +17,6 @@ export default function DataConfidenceLayer({ storm, sources, health, analysis }
     <div className="confidence-table" role="table" aria-label="数据可信度与来源">
       {rows.map((row) => <div className="confidence-row" role="row" key={row.label}><strong>{row.label}</strong><span>{row.source}</span><span>{row.year}</span><em className={'confidence-' + row.status}>{row.status}</em><small>缺失/备注：{row.missing}</small></div>)}
     </div>
-    <p className="a-method-note">“人口代理”表示影响网格缺少暴露人口时使用行政区人口估计，不能解释为真实受灾人口。</p>
+    <p className="a-method-note">“人口代理”表示影响网格缺少暴露人口时，将行政区总人口均匀分配到约 2.5 km 格点；它能反映选址和半径差异，但不能解释为真实街区人口或真实受灾人数。</p>
   </div>
 }

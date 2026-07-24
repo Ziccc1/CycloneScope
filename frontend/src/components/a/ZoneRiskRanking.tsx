@@ -133,7 +133,7 @@ export default function ZoneRiskRanking({ analysis, status, error }: Props) {
       </div>
       <details className="a-definition">
         <summary>口径与缺测处理</summary>
-        <p>危险度和暴露人口来自行政区质心所在影响网格；覆盖指标随基线/当前方案切换。缺测值不参与排序，也不会被当作零值。</p>
+        <p>危险度为行政区内部约 2.5 km 需求格点的均值；高风险人口只统计达到当前阈值的格点。设施以球面距离、服务半径和距离衰减计算，并随基线/当前方案切换。</p>
         <p>{analysis.method}</p>
       </details>
     </div>
